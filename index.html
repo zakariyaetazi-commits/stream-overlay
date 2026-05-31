@@ -142,7 +142,8 @@
 </div>
 
 <script>
-const CORS_PROXY = 'https://api.allorigins.win/get?url=';
+const PROXY1 = 'https://api.allorigins.win/get?url=';
+const PROXY2 = 'https://corsproxy.io/?';
 const feeds = [
   {
     rss: 'https://rss.app/feeds/OAYaUe72hEeptCnv.xml',
@@ -176,12 +177,21 @@ function timeAgo(dateStr) {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-async function fetchFeed(feed) {
+async function fetchFeed(feed, useProxy2) {
   try {
-    const res = await fetch(CORS_PROXY + encodeURIComponent(feed.rss));
-    const data = await res.json();
+    const proxyUrl = useProxy2
+      ? PROXY2 + encodeURIComponent(feed.rss)
+      : PROXY1 + encodeURIComponent(feed.rss);
+    const res = await fetch(proxyUrl);
+    let xmlText;
+    if (useProxy2) {
+      xmlText = await res.text();
+    } else {
+      const data = await res.json();
+      xmlText = data.contents;
+    }
     const parser = new DOMParser();
-    const xml = parser.parseFromString(data.contents, 'text/xml');
+    const xml = parser.parseFromString(xmlText, 'text/xml');
     const item = xml.querySelector('item');
     if (!item) return;
 
@@ -204,12 +214,18 @@ async function fetchFeed(feed) {
       }
     }
   } catch(e) {
-    document.getElementById(feed.textEl).textContent = 'Could not load tweet.';
+    if (!useProxy2) {
+      fetchFeed(feed, true);
+    } else {
+      document.getElementById(feed.textEl).textContent = 'Could not load tweet.';
+    }
   }
 }
 
-function fetchAll() {
-  feeds.forEach(fetchFeed);
+async function fetchAll() {
+  await fetchFeed(feeds[0], false);
+  await new Promise(r => setTimeout(r, 2000));
+  await fetchFeed(feeds[1], false);
 }
 
 fetchAll();
