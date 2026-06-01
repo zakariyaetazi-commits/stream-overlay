@@ -8,9 +8,6 @@
     background: transparent;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
   }
   .tweet-card {
     background: rgba(0, 0, 0, 0.82);
@@ -35,6 +32,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    background: #1d9bf0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -43,8 +41,6 @@
     color: #fff;
     flex-shrink: 0;
   }
-  .avatar-reshad { background: #1d9bf0; }
-  .avatar-fab { background: #e63946; }
   .name-block { flex: 1; }
   .display-name {
     font-weight: 700;
@@ -100,11 +96,9 @@
 </style>
 </head>
 <body>
-
-<!-- Reshad Card -->
-<div class="tweet-card" id="card-reshad">
+<div class="tweet-card" id="card">
   <div class="tweet-header">
-    <div class="avatar avatar-reshad">RR</div>
+    <div class="avatar">RR</div>
     <div class="name-block">
       <div class="display-name">
         Reshad Rahman
@@ -114,52 +108,18 @@
     </div>
     <svg class="x-logo" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
   </div>
-  <div class="tweet-text" id="text-reshad">Loading latest tweet...</div>
-  <div class="tweet-time" id="time-reshad">
-    <div class="live-dot"></div>
-    <span>Checking for updates...</span>
-  </div>
-</div>
-
-<!-- Fabrizio Card -->
-<div class="tweet-card" id="card-fab">
-  <div class="tweet-header">
-    <div class="avatar avatar-fab">FR</div>
-    <div class="name-block">
-      <div class="display-name">
-        Fabrizio Romano
-        <svg class="verified" viewBox="0 0 24 24"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.9-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91C2.88 9.33 2 10.57 2 12s.88 2.67 2.19 3.34c-.46 1.39-.2 2.9.81 3.91s2.52 1.26 3.91.8c.66 1.31 1.9 2.19 3.34 2.19s2.67-.88 3.33-2.19c1.4.46 2.91.2 3.92-.81s1.26-2.52.8-3.91C21.37 14.67 22.25 13.43 22.25 12zm-13.06 4.35L6 13.09l1.41-1.42 1.78 1.79 5.4-5.41 1.42 1.41-6.82 6.89z"/></svg>
-      </div>
-      <div class="username">@FabrizioRomano</div>
-    </div>
-    <svg class="x-logo" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-  </div>
-  <div class="tweet-text" id="text-fab">Loading latest tweet...</div>
-  <div class="tweet-time" id="time-fab">
+  <div class="tweet-text" id="tweet-text">Loading latest tweet...</div>
+  <div class="tweet-time" id="tweet-time">
     <div class="live-dot"></div>
     <span>Checking for updates...</span>
   </div>
 </div>
 
 <script>
+const RSS_URL = 'https://rss.app/feeds/OAYaUe72hEeptCnv.xml';
 const PROXY1 = 'https://api.allorigins.win/get?url=';
 const PROXY2 = 'https://corsproxy.io/?';
-const feeds = [
-  {
-    rss: 'https://rss.app/feeds/OAYaUe72hEeptCnv.xml',
-    textEl: 'text-reshad',
-    timeEl: 'time-reshad',
-    cardEl: 'card-reshad',
-    last: ''
-  },
-  {
-    rss: 'https://rss.app/feeds/LhslazrrS5Sjd9iT.xml',
-    textEl: 'text-fab',
-    timeEl: 'time-fab',
-    cardEl: 'card-fab',
-    last: ''
-  }
-];
+let lastTitle = '';
 
 function stripHtml(html) {
   const tmp = document.createElement('div');
@@ -177,12 +137,10 @@ function timeAgo(dateStr) {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-async function fetchFeed(feed, useProxy2) {
+async function fetchLatest(useProxy2) {
   try {
-    const proxyUrl = useProxy2
-      ? PROXY2 + encodeURIComponent(feed.rss)
-      : PROXY1 + encodeURIComponent(feed.rss);
-    const res = await fetch(proxyUrl);
+    const url = useProxy2 ? PROXY2 + encodeURIComponent(RSS_URL) : PROXY1 + encodeURIComponent(RSS_URL);
+    const res = await fetch(url);
     let xmlText;
     if (useProxy2) {
       xmlText = await res.text();
@@ -197,14 +155,14 @@ async function fetchFeed(feed, useProxy2) {
 
     const title = item.querySelector('title')?.textContent || '';
     const pubDate = item.querySelector('pubDate')?.textContent || '';
-    const isNew = feed.last !== '' && title !== feed.last;
+    const isNew = lastTitle !== '' && title !== lastTitle;
 
-    if (title !== feed.last) {
-      feed.last = title;
+    if (title !== lastTitle) {
+      lastTitle = title;
       const clean = stripHtml(title);
-      const textEl = document.getElementById(feed.textEl);
-      const timeEl = document.getElementById(feed.timeEl);
-      const card = document.getElementById(feed.cardEl);
+      const textEl = document.getElementById('tweet-text');
+      const timeEl = document.getElementById('tweet-time');
+      const card = document.getElementById('card');
       textEl.innerHTML = clean + (isNew ? '<span class="new-badge">NEW</span>' : '');
       timeEl.innerHTML = '<div class="live-dot"></div><span>' + timeAgo(pubDate) + '</span>';
       if (isNew) {
@@ -215,21 +173,15 @@ async function fetchFeed(feed, useProxy2) {
     }
   } catch(e) {
     if (!useProxy2) {
-      fetchFeed(feed, true);
+      fetchLatest(true);
     } else {
-      document.getElementById(feed.textEl).textContent = 'Could not load tweet.';
+      document.getElementById('tweet-text').textContent = 'Could not load tweet.';
     }
   }
 }
 
-async function fetchAll() {
-  await fetchFeed(feeds[0], false);
-  await new Promise(r => setTimeout(r, 2000));
-  await fetchFeed(feeds[1], false);
-}
-
-fetchAll();
-setInterval(fetchAll, 120000);
+fetchLatest(false);
+setInterval(() => fetchLatest(false), 120000);
 </script>
 </body>
 </html>
