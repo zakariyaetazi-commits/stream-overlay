@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:transparent; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; width:460px; overflow:hidden; }
+.top-bar { display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:16px; padding:10px 16px; margin-bottom:12px; box-shadow:0 4px 24px rgba(0,0,0,0.18); }
+.team-info { display:flex; align-items:center; gap:8px; }
+.team-logo { width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; border:2px solid #eee; overflow:hidden; flex-shrink:0; background:#fff; }
+.team-logo img { width:100%; height:100%; object-fit:contain; border-radius:0; }
+.team-name { font-size:14px; font-weight:700; color:#111; }
+.team-formation { font-size:11px; color:#888; }
+.score-area { display:flex; align-items:center; gap:8px; flex-direction:column; }
+.score-row { display:flex; align-items:center; gap:8px; }
+.score-num { font-size:28px; font-weight:900; color:#111; min-width:28px; text-align:center; }
+.score-sep { font-size:22px; font-weight:700; color:#ccc; }
+.timer-badge { background:#111; color:#fff; border-radius:6px; padding:3px 10px; font-size:13px; font-weight:700; font-family:monospace; }
+.carousel-wrap { width:460px; overflow:hidden; border-radius:16px; }
+.carousel-track { display:flex; width:920px; transition:transform 0.6s cubic-bezier(0.77,0,0.18,1); }
+.lineup-card { width:460px; background:#111; border-radius:16px; padding:14px 16px; box-shadow:0 4px 24px rgba(0,0,0,0.22); flex-shrink:0; }
+.lineup-title { font-size:12px; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; text-align:center; padding-bottom:8px; border-bottom:1px solid #222; }
+.player-item { display:flex; align-items:center; gap:10px; padding:5px 0; border-bottom:1px solid #1a1a1a; }
+.player-item:last-child { border-bottom:none; }
+.player-avatar { width:32px; height:32px; border-radius:50%; background:#222; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; overflow:hidden; border:2px solid #333; }
+.player-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.player-num-badge { width:22px; font-size:12px; font-weight:700; color:#fff; text-align:center; flex-shrink:0; }
+.player-name { font-size:13px; color:#fff; font-weight:500; }
+.dots { display:flex; justify-content:center; gap:6px; margin-top:8px; }
+.dot { width:8px; height:8px; border-radius:50%; background:#333; transition:background 0.3s; }
+.dot.active { background:#fff; }
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <div class="team-info">
+    <div class="team-logo" id="logo1">🏳</div>
+    <div>
+      <div class="team-name" id="name1">Team One</div>
+      <div class="team-formation" id="form1">4-3-3</div>
+    </div>
+  </div>
+  <div class="score-area">
+    <div class="timer-badge" id="timer">00:00</div>
+    <div class="score-row">
+      <div class="score-num" id="score1">0</div>
+      <div class="score-sep">:</div>
+      <div class="score-num" id="score2">0</div>
+    </div>
+  </div>
+  <div class="team-info" style="flex-direction:row-reverse;">
+    <div class="team-logo" id="logo2">🏳</div>
+    <div style="text-align:right;">
+      <div class="team-name" id="name2">Team Two</div>
+      <div class="team-formation" id="form2">4-4-2</div>
+    </div>
+  </div>
+</div>
+<div class="carousel-wrap">
+  <div class="carousel-track" id="track">
+    <div class="lineup-card" id="panel1">
+      <div class="lineup-title" id="title1">Team One</div>
+      <div id="players1"></div>
+    </div>
+    <div class="lineup-card" id="panel2">
+      <div class="lineup-title" id="title2">Team Two</div>
+      <div id="players2"></div>
+    </div>
+  </div>
+</div>
+<div class="dots">
+  <div class="dot active" id="dot1"></div>
+  <div class="dot" id="dot2"></div>
+</div>
+
+<script>
+let current=0,localSec=0,timerRunning=false,timerSetAt=Date.now(),lastLoaded=null;
+
+function loadData(){
+  try{
+    const raw=localStorage.getItem('matchData');
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    if(JSON.stringify(d)===lastLoaded)return;
+    lastLoaded=JSON.stringify(d);
+    document.getElementById('name1').textContent=d.team1.name||'Team One';
+    document.getElementById('name2').textContent=d.team2.name||'Team Two';
+    document.getElementById('form1').textContent=d.team1.formation||'';
+    document.getElementById('form2').textContent=d.team2.formation||'';
+    document.getElementById('score1').textContent=d.score[0]||0;
+    document.getElementById('score2').textContent=d.score[1]||0;
+    document.getElementById('title1').textContent=d.team1.name||'Team One';
+    document.getElementById('title2').textContent=d.team2.name||'Team Two';
+    document.getElementById('panel1').style.borderTop='3px solid '+(d.team1.color||'#1d9bf0');
+    document.getElementById('panel2').style.borderTop='3px solid '+(d.team2.color||'#e63946');
+    setLogo('logo1',d.team1.logo,d.team1.color);
+    setLogo('logo2',d.team2.logo,d.team2.color);
+    renderPlayers('players1',d.team1.players||[],d.team1.color);
+    renderPlayers('players2',d.team2.players||[],d.team2.color);
+    localSec=d.timerSec||0;
+    timerRunning=d.timerRunning||false;
+    timerSetAt=d.timerSetAt||Date.now();
+    if(timerRunning){
+      const elapsed=Math.floor((Date.now()-timerSetAt)/1000);
+      localSec=(d.timerSec||0)+elapsed;
+    }
+  }catch(e){}
+}
+
+function tickTimer(){
+  if(timerRunning)localSec++;
+  const m=Math.floor(localSec/60),s=localSec%60;
+  document.getElementById('timer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+function setLogo(id,src,color){
+  const el=document.getElementById(id);
+  el.style.borderColor=color||'#eee';
+  el.innerHTML=src?'<img src="'+src+'">':(color?'🏳':'🏳');
+}
+
+function renderPlayers(id,players,color){
+  const el=document.getElementById(id);
+  el.innerHTML='';
+  for(let i=0;i<11;i++){
+    const p=players[i]||{};
+    const div=document.createElement('div');div.className='player-item';
+    const avatar=document.createElement('div');avatar.className='player-avatar';
+    avatar.style.borderColor=color||'#333';
+    if(p.pic){avatar.innerHTML='<img src="'+p.pic+'">';}
+    else{avatar.textContent=p.number||(i+1);avatar.style.background=color?color+'33':'#222';avatar.style.color=color||'#fff';}
+    const num=document.createElement('div');num.className='player-num-badge';
+    num.textContent=p.number||(i+1);
+    num.style.color=color||'#fff';
+    const name=document.createElement('div');name.className='player-name';
+    name.textContent=p.name||'Player '+(i+1);
+    div.appendChild(avatar);div.appendChild(num);div.appendChild(name);
+    el.appendChild(div);
+  }
+}
+
+function slide(){
+  current=(current+1)%2;
+  document.getElementById('track').style.transform='translateX('+(current===0?'0':'-460')+'px)';
+  document.getElementById('dot1').classList.toggle('active',current===0);
+  document.getElementById('dot2').classList.toggle('active',current===1);
+}
+
+loadData();
+setInterval(loadData,1000);
+setInterval(tickTimer,1000);
+setInterval(slide,10000);
+</script>
+</body>
+</html>
