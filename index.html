@@ -7,17 +7,101 @@
   body {
     background: transparent;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+  }
+  .wrapper {
+    position: relative;
+    width: 400px;
   }
   iframe {
     display: block;
     border: none;
+    width: 400px;
+    height: 786px;
+  }
+  #momentum {
+    width: 400px;
+    height: 286px;
+    display: block;
+    border: none;
+  }
+  #cursor {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 6px rgba(255,255,255,0.8);
+  }
+  #label {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    z-index: 9999;
+    pointer-events: none;
   }
 </style>
 </head>
 <body>
-<iframe src="https://widgets.sofascore.com/embed/lineups?id=15184400&widgetTheme=dark" style="width:400px;height:786px;" scrolling="no" frameborder="0"></iframe>
-<iframe src="https://widgets.sofascore.com/embed/attackMomentum?id=15184400&widgetTheme=dark" style="width:400px;height:286px;" scrolling="no" frameborder="0"></iframe>
+<div id="cursor"></div>
+<div id="label">🇺🇸 USA</div>
+<div class="wrapper">
+  <iframe id="lineup" src="https://widgets.sofascore.com/embed/lineups?id=15184400&widgetTheme=dark" scrolling="no" frameborder="0"></iframe>
+</div>
+<iframe id="momentum" src="https://widgets.sofascore.com/embed/attackMomentum?id=15184400&widgetTheme=dark" scrolling="no" frameborder="0"></iframe>
+
+<script>
+const cursor = document.getElementById('cursor');
+const label = document.getElementById('label');
+const iframe = document.getElementById('lineup');
+
+// Tab positions inside the iframe (approximate)
+// USA tab is on the left (~100px from left, ~30px from top)
+// Germany tab is on the right (~300px from left, ~30px from top)
+const tabs = [
+  { x: 100, y: 30, name: '🇺🇸 USA' },
+  { x: 300, y: 30, name: '🇩🇪 Germany' }
+];
+
+let current = 0;
+
+function clickTab(index) {
+  const tab = tabs[index];
+  const rect = iframe.getBoundingClientRect();
+
+  // Move cursor to tab position
+  cursor.style.left = (rect.left + tab.x) + 'px';
+  cursor.style.top = (rect.top + tab.y) + 'px';
+  label.textContent = tab.name;
+
+  // Simulate click inside iframe
+  try {
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    const el = iframeDoc.elementFromPoint(tab.x, tab.y);
+    if (el) el.click();
+  } catch(e) {
+    // If cross-origin blocks direct click, use postMessage or pointer events
+    iframe.contentWindow.postMessage({ type: 'click', x: tab.x, y: tab.y }, '*');
+  }
+}
+
+// Start on USA
+setTimeout(() => {
+  clickTab(0);
+  setInterval(() => {
+    current = (current + 1) % 2;
+    clickTab(current);
+  }, 10000);
+}, 3000);
+</script>
 </body>
 </html>
