@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match Control Panel</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#111; color:#fff; min-height:100vh; padding:20px; }
+h1 { font-size:20px; font-weight:700; margin-bottom:20px; color:#fff; text-align:center; letter-spacing:1px; }
+h2 { font-size:14px; font-weight:600; color:#aaa; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.card { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:12px; padding:16px; }
+.card.full { grid-column:1/-1; }
+label { font-size:12px; color:#888; display:block; margin-bottom:4px; margin-top:10px; }
+input[type=text], input[type=number] { width:100%; background:#222; border:1px solid #333; border-radius:8px; padding:8px 12px; color:#fff; font-size:14px; outline:none; }
+input:focus { border-color:#555; }
+.logo-preview { width:60px; height:60px; border-radius:50%; object-fit:cover; background:#222; border:2px solid #333; display:flex; align-items:center; justify-content:center; font-size:22px; overflow:hidden; }
+.logo-preview img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.upload-btn { display:inline-block; background:#222; border:1px dashed #444; border-radius:8px; padding:8px 14px; font-size:12px; color:#888; cursor:pointer; margin-top:6px; text-align:center; width:100%; }
+.upload-btn:hover { border-color:#666; color:#ccc; }
+.player-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.player-num { width:28px; height:28px; border-radius:50%; background:#333; display:flex; align-items:center; justify-content:center; font-size:11px; color:#888; flex-shrink:0; }
+.player-row input { flex:1; }
+.player-pic { width:28px; height:28px; border-radius:50%; background:#222; border:1px solid #333; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; overflow:hidden; flex-shrink:0; }
+.player-pic img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.score-ctrl { display:flex; align-items:center; gap:10px; margin-top:8px; }
+.score-btn { width:36px; height:36px; border-radius:8px; border:none; background:#333; color:#fff; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.score-btn:hover { background:#444; }
+.score-display { font-size:28px; font-weight:700; min-width:40px; text-align:center; }
+.timer-ctrl { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px; }
+.timer-display { font-size:28px; font-weight:700; font-family:monospace; }
+.btn { padding:10px 18px; border-radius:8px; border:none; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-green { background:#16a34a; color:#fff; }
+.btn-red { background:#dc2626; color:#fff; }
+.btn-blue { background:#2563eb; color:#fff; }
+.btn-gray { background:#333; color:#fff; }
+.btn:hover { opacity:0.85; }
+.save-btn { width:100%; padding:14px; border-radius:10px; border:none; background:#2563eb; color:#fff; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px; }
+.save-btn:hover { background:#1d4ed8; }
+.team-header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.formation-input { width:100%; background:#222; border:1px solid #333; border-radius:8px; padding:8px 12px; color:#fff; font-size:14px; outline:none; }
+select { width:100%; background:#222; border:1px solid #333; border-radius:8px; padding:8px 12px; color:#fff; font-size:14px; outline:none; }
+.status { text-align:center; font-size:13px; color:#16a34a; margin-top:8px; display:none; }
+</style>
+</head>
+<body>
+<h1>⚽ Match Control Panel</h1>
+
+<div class="grid">
+  <!-- Team 1 -->
+  <div class="card">
+    <h2>Team 1</h2>
+    <div class="team-header">
+      <div class="logo-preview" id="logo1-preview">🏳</div>
+      <div style="flex:1">
+        <label>Team Name</label>
+        <input type="text" id="team1-name" value="Team One" oninput="sync()">
+        <label>Formation</label>
+        <input type="text" id="team1-formation" value="4-3-3" oninput="sync()">
+      </div>
+    </div>
+    <label>Upload Logo</label>
+    <label class="upload-btn">📁 Choose Logo <input type="file" accept="image/*" style="display:none" onchange="loadLogo(event,1)"></label>
+    <label>Color</label>
+    <input type="color" id="team1-color" value="#1d9bf0" oninput="sync()" style="width:100%;height:36px;border-radius:8px;border:1px solid #333;background:#222;cursor:pointer;">
+  </div>
+
+  <!-- Team 2 -->
+  <div class="card">
+    <h2>Team 2</h2>
+    <div class="team-header">
+      <div class="logo-preview" id="logo2-preview">🏳</div>
+      <div style="flex:1">
+        <label>Team Name</label>
+        <input type="text" id="team2-name" value="Team Two" oninput="sync()">
+        <label>Formation</label>
+        <input type="text" id="team2-formation" value="4-4-2" oninput="sync()">
+      </div>
+    </div>
+    <label>Upload Logo</label>
+    <label class="upload-btn">📁 Choose Logo <input type="file" accept="image/*" style="display:none" onchange="loadLogo(event,2)"></label>
+    <label>Color</label>
+    <input type="color" id="team2-color" value="#e63946" oninput="sync()" style="width:100%;height:36px;border-radius:8px;border:1px solid #333;background:#222;cursor:pointer;">
+  </div>
+
+  <!-- Score -->
+  <div class="card">
+    <h2>Score</h2>
+    <div style="display:flex;gap:20px;align-items:center;justify-content:center;margin-top:4px;">
+      <div style="text-align:center;">
+        <div style="font-size:12px;color:#888;margin-bottom:4px;" id="s1-label">Team 1</div>
+        <div class="score-ctrl">
+          <button class="score-btn" onclick="changeScore(1,-1)">−</button>
+          <div class="score-display" id="score1">0</div>
+          <button class="score-btn" onclick="changeScore(1,1)">+</button>
+        </div>
+      </div>
+      <div style="font-size:28px;font-weight:700;color:#555;">:</div>
+      <div style="text-align:center;">
+        <div style="font-size:12px;color:#888;margin-bottom:4px;" id="s2-label">Team 2</div>
+        <div class="score-ctrl">
+          <button class="score-btn" onclick="changeScore(2,-1)">−</button>
+          <div class="score-display" id="score2">0</div>
+          <button class="score-btn" onclick="changeScore(2,1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timer -->
+  <div class="card">
+    <h2>Timer</h2>
+    <div style="text-align:center;">
+      <div class="timer-display" id="timer-display">00:00</div>
+      <div class="timer-ctrl" style="justify-content:center;margin-top:12px;">
+        <button class="btn btn-green" onclick="startTimer()">▶ Start</button>
+        <button class="btn btn-red" onclick="stopTimer()">⏸ Pause</button>
+        <button class="btn btn-gray" onclick="resetTimer()">↺ Reset</button>
+      </div>
+      <div style="margin-top:10px;">
+        <label>Set minute</label>
+        <input type="number" id="timer-set" value="0" min="0" max="120" style="width:80px;text-align:center;">
+        <button class="btn btn-blue" style="margin-left:8px;padding:8px 12px;" onclick="setTimer()">Set</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lineups -->
+<div class="grid">
+  <div class="card">
+    <h2>Team 1 Lineup</h2>
+    <div id="lineup1"></div>
+  </div>
+  <div class="card">
+    <h2>Team 2 Lineup</h2>
+    <div id="lineup2"></div>
+  </div>
+</div>
+
+<button class="save-btn" onclick="saveAll()">💾 Save & Update Overlay</button>
+<div class="status" id="status">✅ Overlay updated!</div>
+
+<script>
+let score = [0, 0];
+let timerSec = 0;
+let timerInterval = null;
+let data = { team1:{name:'Team One',logo:'',color:'#1d9bf0',formation:'4-3-3',players:[]}, team2:{name:'Team Two',logo:'',color:'#e63946',formation:'4-4-2',players:[]}, score:[0,0], timer:0 };
+let playerPics = [{}, {}];
+
+function buildLineups() {
+  [1,2].forEach(t => {
+    const el = document.getElementById('lineup' + t);
+    el.innerHTML = '';
+    for(let i=0;i<11;i++) {
+      const row = document.createElement('div');
+      row.className = 'player-row';
+      const stored = (t===1?data.team1:data.team2).players[i] || {};
+      const picDiv = document.createElement('div');
+      picDiv.className = 'player-pic';
+      picDiv.id = 'ppic-' + t + '-' + i;
+      picDiv.innerHTML = playerPics[t-1][i] ? '<img src="'+playerPics[t-1][i]+'">' : (i+1);
+      picDiv.onclick = (()=>{const ti=t,ii=i; return ()=>triggerPicUpload(ti,ii);})();
+      const numDiv = document.createElement('div');
+      numDiv.className = 'player-num';
+      numDiv.textContent = i+1;
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.placeholder = 'Player ' + (i+1);
+      inp.value = stored.name || '';
+      inp.oninput = (()=>{const ti=t,ii=i;return e=>{if(ti===1){if(!data.team1.players[ii])data.team1.players[ii]={};data.team1.players[ii].name=e.target.value;}else{if(!data.team2.players[ii])data.team2.players[ii]={};data.team2.players[ii].name=e.target.value;}};})();
+      row.appendChild(picDiv);
+      row.appendChild(numDiv);
+      row.appendChild(inp);
+      el.appendChild(row);
+    }
+  });
+}
+
+function triggerPicUpload(team, idx) {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      playerPics[team-1][idx] = ev.target.result;
+      const el = document.getElementById('ppic-'+team+'-'+idx);
+      el.innerHTML = '<img src="'+ev.target.result+'">';
+      if(team===1){if(!data.team1.players[idx])data.team1.players[idx]={};data.team1.players[idx].pic=ev.target.result;}
+      else{if(!data.team2.players[idx])data.team2.players[idx]={};data.team2.players[idx].pic=ev.target.result;}
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+function loadLogo(e, team) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const preview = document.getElementById('logo'+team+'-preview');
+    preview.innerHTML = '<img src="'+ev.target.result+'">';
+    if(team===1) data.team1.logo = ev.target.result;
+    else data.team2.logo = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function changeScore(team, delta) {
+  score[team-1] = Math.max(0, score[team-1] + delta);
+  document.getElementById('score'+team).textContent = score[team-1];
+  data.score = [...score];
+}
+
+function startTimer() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    timerSec++;
+    data.timer = timerSec;
+    updateTimerDisplay();
+  }, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+function resetTimer() { stopTimer(); timerSec = 0; data.timer = 0; updateTimerDisplay(); }
+function setTimer() { timerSec = parseInt(document.getElementById('timer-set').value||0)*60; data.timer = timerSec; updateTimerDisplay(); }
+function updateTimerDisplay() {
+  const m = Math.floor(timerSec/60);
+  const s = timerSec%60;
+  document.getElementById('timer-display').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+function sync() {
+  data.team1.name = document.getElementById('team1-name').value;
+  data.team2.name = document.getElementById('team2-name').value;
+  data.team1.formation = document.getElementById('team1-formation').value;
+  data.team2.formation = document.getElementById('team2-formation').value;
+  data.team1.color = document.getElementById('team1-color').value;
+  data.team2.color = document.getElementById('team2-color').value;
+  document.getElementById('s1-label').textContent = data.team1.name;
+  document.getElementById('s2-label').textContent = data.team2.name;
+}
+
+function saveAll() {
+  sync();
+  for(let i=0;i<11;i++){
+    const v1 = document.querySelector('#lineup1 .player-row:nth-child('+(i+1)+') input');
+    const v2 = document.querySelector('#lineup2 .player-row:nth-child('+(i+1)+') input');
+    if(!data.team1.players[i]) data.team1.players[i]={};
+    if(!data.team2.players[i]) data.team2.players[i]={};
+    if(v1) data.team1.players[i].name = v1.value;
+    if(v2) data.team2.players[i].name = v2.value;
+    if(playerPics[0][i]) data.team1.players[i].pic = playerPics[0][i];
+    if(playerPics[1][i]) data.team2.players[i].pic = playerPics[1][i];
+  }
+  localStorage.setItem('matchData', JSON.stringify(data));
+  const s = document.getElementById('status');
+  s.style.display = 'block';
+  setTimeout(()=>s.style.display='none', 2000);
+}
+
+buildLineups();
+sync();
+setInterval(saveAll, 5000);
+</script>
+</body>
+</html>
