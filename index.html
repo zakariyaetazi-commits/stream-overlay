@@ -20,8 +20,8 @@
   #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
 
   .glass{position:relative;border-radius:26px;
-    background:linear-gradient(135deg,rgba(0,77,152,.34),rgba(9,13,36,.66) 48%,rgba(165,0,68,.30));
-    backdrop-filter:blur(36px) saturate(150%);-webkit-backdrop-filter:blur(36px) saturate(150%);
+    background:linear-gradient(135deg,rgba(0,38,90,.50),rgba(4,7,22,.86) 48%,rgba(105,0,42,.44));
+    backdrop-filter:blur(48px) saturate(130%);-webkit-backdrop-filter:blur(48px) saturate(130%);
     box-shadow:0 0 26px rgba(0,77,152,.55),0 0 44px rgba(165,0,68,.35);
     transition:opacity .5s,transform .5s}
   .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;
@@ -130,7 +130,7 @@
     <div class="side away"><div class="crest" id="aCrest"></div><div class="nm" id="aName"></div><div class="sc" id="aScore">0</div></div>
   </div>
 
-  <div id="chat" class="glass alt"><iframe id="chatFrame" allowtransparency="true"></iframe></div>
+  <div id="chat" class="glass alt"></div>
   <div id="cta" class="glass"><span id="ctaText"></span></div>
 
   <div id="right">
@@ -203,8 +203,7 @@
         <label><input type="checkbox" data-c="show.chat"> Chat box</label>
       </div>
       <h2 style="margin-top:20px">Chat</h2>
-      <label>Streamlabs chat box widget link (already built in; paste a new one here only to replace it)</label>
-      <input type="text" data-b="chatUrl" placeholder="https://streamlabs.com/widgets/chat-box/v1/…">
+      <small class="hint">The overlay shows an empty chat panel (440 × 600 px, top-left at x 30, y 190). Add your Streamlabs chat as its own source on top of it: size 424 × 584, position x 38, y 198.</small>
 
       <details style="margin-top:10px"><summary style="cursor:pointer;color:#a8b8e6">Custom CSS for the Streamlabs chat box (same font and look)</summary>
         <textarea id="cssBox" readonly style="width:100%;height:190px;margin-top:8px;background:#0c1126;color:#cfe0ff;border:1px solid #27325c;border-radius:10px;padding:10px;font:13px monospace"></textarea>
@@ -259,7 +258,6 @@
    "https://my-overlay-default-rtdb.europe-west1.firebasedatabase.app"
    Leave empty for local-only mode (same browser only).
 ---------------------------------------------------------------- */
-const CHAT_DEFAULT = "https://streamlabs.com/widgets/chat-box/v1/A8A3CFD7341AD31DADDAC7B1DB13A9678D1BBC227D5FEF188E2900CE324DFF593027CAD914A8E5FC709D9E6E2C0FECB9E150580E28E4984202D11B23F30173FBB7DAC1C43895C1CE6DC6473D8A04A8E4EFB1A7800725BD058AA508DC8D4F1905ED97F5BBB67167FB366B84EBDE382CE6B97A5326F7C909D913ECF1EDA2";
 const FIREBASE_URL = "https://score-15512-default-rtdb.firebaseio.com";
 
 /* ===================== shared state + sync ===================== */
@@ -423,17 +421,11 @@ if (!CONTROL) {
     $('fxList').innerHTML = prevHtml + nextHtml;
     fitName($('hName')); fitName($('aName'));
 
-    const chatSrc = S.chatUrl || CHAT_DEFAULT;
-    if (chatSrc !== lastVideo) {
-      lastVideo = chatSrc;
-      const f = $('chatFrame');
-      if (chatSrc) f.src = chatSrc; else f.removeAttribute('src');
-    }
     const sh = S.show;
     $('score').classList.toggle('hide', !sh.score);
     $('table').classList.toggle('hide', !sh.table);
     $('fixtures').classList.toggle('hide', !sh.fixtures);
-    $('chat').classList.toggle('hide', !(sh.chat && (S.chatUrl || CHAT_DEFAULT)));
+    $('chat').classList.toggle('hide', !sh.chat);
   }
   function tick() {
     const t = S.timer, e = Math.max(0, Math.floor(t.base + (t.running ? (Date.now() - t.startedAt) / 1000 : 0)));
