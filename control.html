@@ -1,271 +1,456 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Match Control Panel</title>
+<meta charset="utf-8">
+<title>Stream Overlay</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#111; color:#fff; min-height:100vh; padding:20px; }
-h1 { font-size:20px; font-weight:700; margin-bottom:20px; color:#fff; text-align:center; letter-spacing:1px; }
-h2 { font-size:14px; font-weight:600; color:#aaa; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
-.grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
-.card { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:12px; padding:16px; }
-.card.full { grid-column:1/-1; }
-label { font-size:12px; color:#888; display:block; margin-bottom:4px; margin-top:10px; }
-input[type=text], input[type=number] { width:100%; background:#222; border:1px solid #333; border-radius:8px; padding:8px 12px; color:#fff; font-size:14px; outline:none; }
-input:focus { border-color:#555; }
-.logo-preview { width:60px; height:60px; border-radius:50%; object-fit:cover; background:#222; border:2px solid #333; display:flex; align-items:center; justify-content:center; font-size:22px; overflow:hidden; }
-.logo-preview img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-.upload-btn { display:inline-block; background:#222; border:1px dashed #444; border-radius:8px; padding:8px 14px; font-size:12px; color:#888; cursor:pointer; margin-top:6px; text-align:center; width:100%; }
-.upload-btn:hover { border-color:#666; color:#ccc; }
-.player-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-.player-num { width:28px; height:28px; border-radius:50%; background:#333; display:flex; align-items:center; justify-content:center; font-size:11px; color:#888; flex-shrink:0; }
-.player-row input { flex:1; }
-.player-pic { width:28px; height:28px; border-radius:50%; background:#222; border:1px solid #333; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; overflow:hidden; flex-shrink:0; }
-.player-pic img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-.score-ctrl { display:flex; align-items:center; gap:10px; margin-top:8px; }
-.score-btn { width:36px; height:36px; border-radius:8px; border:none; background:#333; color:#fff; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-.score-btn:hover { background:#444; }
-.score-display { font-size:28px; font-weight:700; min-width:40px; text-align:center; }
-.timer-ctrl { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px; }
-.timer-display { font-size:28px; font-weight:700; font-family:monospace; }
-.btn { padding:10px 18px; border-radius:8px; border:none; font-size:13px; font-weight:600; cursor:pointer; }
-.btn-green { background:#16a34a; color:#fff; }
-.btn-red { background:#dc2626; color:#fff; }
-.btn-blue { background:#2563eb; color:#fff; }
-.btn-gray { background:#333; color:#fff; }
-.btn:hover { opacity:0.85; }
-.save-btn { width:100%; padding:14px; border-radius:10px; border:none; background:#2563eb; color:#fff; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px; }
-.save-btn:hover { background:#1d4ed8; }
-.team-header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
-.formation-input { width:100%; background:#222; border:1px solid #333; border-radius:8px; padding:8px 12px; color:#fff; font-size:14px; outline:none; }
-select { width:100%; background:#222; border:1px solid #333; border-radius:8px; padding:8px 12px; color:#fff; font-size:14px; outline:none; }
-.status { text-align:center; font-size:13px; color:#16a34a; margin-top:8px; display:none; }
+  :root{--blue:#004D98;--blue2:#2b8cf0;--garnet:#A50044;--gold:#EDBB00}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;font-family:'Outfit',system-ui,sans-serif;color:#fff;font-variant-numeric:tabular-nums}
+  body.overlay{overflow:hidden;background:transparent}
+  body.control{background:radial-gradient(1200px 600px at 10% -10%,rgba(0,77,152,.45),transparent),radial-gradient(900px 500px at 100% 0,rgba(165,0,68,.4),transparent),#0a0d1a;padding:20px;min-height:100vh;height:auto}
+  body.control #stage{display:none}
+  body.overlay #app{display:none}
+
+  /* ================= OVERLAY ================= */
+  #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+
+  .glass{position:relative;border-radius:26px;
+    background:linear-gradient(135deg,rgba(0,77,152,.34),rgba(9,13,36,.66) 48%,rgba(165,0,68,.30));
+    backdrop-filter:blur(36px) saturate(150%);-webkit-backdrop-filter:blur(36px) saturate(150%);
+    box-shadow:0 0 26px rgba(0,77,152,.55),0 0 44px rgba(165,0,68,.35);
+    transition:opacity .5s,transform .5s}
+  .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;
+    background:linear-gradient(90deg,var(--blue2),var(--garnet),var(--gold),var(--garnet),var(--blue2));
+    background-size:300% 100%;animation:flow 7s linear infinite;
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+  .glass::after{content:"";position:absolute;top:-1px;left:14%;width:34%;height:3px;border-radius:3px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    box-shadow:0 0 14px 2px rgba(237,187,0,.7);animation:sweep 6s ease-in-out infinite alternate;pointer-events:none}
+  .glass.alt::after{top:auto;bottom:-1px;left:auto;right:12%;
+    background:linear-gradient(90deg,transparent,var(--garnet),transparent);box-shadow:0 0 14px 2px rgba(165,0,68,.9)}
+  @keyframes flow{to{background-position:300% 0}}
+  @keyframes sweep{from{transform:translateX(-30px);opacity:.5}to{transform:translateX(60px);opacity:1}}
+  .hide{opacity:0;transform:translateY(-14px);pointer-events:none}
+
+  /* scoreboard */
+  #score{position:absolute;left:50%;top:28px;width:1060px;height:124px;margin-left:-530px;
+    display:grid;grid-template-columns:1fr 210px 1fr;align-items:center;padding:0 34px}
+  .side{display:flex;align-items:center;gap:18px;min-width:0}
+  .side.away{flex-direction:row-reverse}
+  .nm{font-weight:700;font-size:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+  .side.away .nm{text-align:right}
+  .crest{width:80px;height:80px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;font-size:24px;
+    background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);overflow:hidden}
+  .crest img{width:100%;height:100%;object-fit:contain;padding:6px}
+  .sc{font-weight:800;font-size:66px;width:74px;text-align:center;line-height:1}
+  .pop{animation:pop .7s}
+  @keyframes pop{30%{transform:scale(1.45);color:var(--gold)}100%{transform:scale(1)}}
+  .mid{text-align:center}
+  #comp{font-weight:600;font-size:15px;letter-spacing:2px;color:var(--gold);margin-bottom:0}
+  #clock{font-weight:800;font-size:46px;line-height:1.05}
+  #added{display:inline-block;margin-left:8px;font-size:24px;font-weight:700;color:var(--gold);vertical-align:top}
+  #period{font-weight:600;font-size:14px;letter-spacing:2px;color:#d6e4ff}
+
+  /* chat (left) */
+  #chat{position:absolute;left:30px;top:190px;width:440px;height:600px;overflow:hidden}
+  #chat iframe{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);border:0;border-radius:20px;background:transparent;pointer-events:none}
+
+  /* right column: fixtures then table, same width */
+  #right{position:absolute;right:30px;top:190px;width:450px;display:flex;flex-direction:column;gap:18px}
+  #fixtures,#table{padding:18px 20px}
+  .ttl{font-weight:800;font-size:20px;color:var(--gold);margin-bottom:8px}
+  .fx{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.18);font-size:20px;font-weight:600}
+  .fx:last-child{border:0}.fx span{flex:1}
+  .fx small{font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap}
+  table{width:100%;border-collapse:collapse;font-size:16px;font-weight:600}
+  th{font-size:12px;font-weight:700;color:#bcd1fa;text-align:center;padding-bottom:5px}
+  td{text-align:center;padding:2px 0}
+  th:nth-child(2),td:nth-child(2){text-align:left;padding-left:8px}
+  td:first-child{color:#cfe0ff;width:28px;font-weight:700}
+  td:last-child{font-weight:800}
+  tr.me td{background:linear-gradient(90deg,rgba(0,77,152,.85),rgba(165,0,68,.75))}
+  tr.me td:first-child{border-radius:8px 0 0 8px}tr.me td:last-child{border-radius:0 8px 8px 0}
+  tr.me td:nth-child(2){color:var(--gold);font-weight:800}
+
+  /* ================= CONTROL ================= */
+  body.control{font-size:17px}
+  h1{font-size:24px;font-weight:800;margin-bottom:2px}
+  h2{font-size:17px;font-weight:700;color:var(--gold);margin:0 0 12px}
+  .top{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+  #status{font-size:13px;font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid #27325c}
+  #status.ok{color:#5dffb0;border-color:#1c7a52}#status.bad{color:#ff7a95;border-color:#8a2340}
+  a{color:var(--blue2)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+  .card{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid #27325c;border-radius:18px;padding:18px}
+  .card.wide{grid-column:1/-1}
+  label{display:block;font-size:14px;color:#a8b8e6;margin:8px 0 3px}
+  input[type=text],input[type=number],select{width:100%;background:#0c1126;color:#fff;border:1px solid #27325c;border-radius:10px;padding:9px 11px;font:inherit}
+  input:focus,select:focus{outline:2px solid var(--blue2);border-color:transparent}
+  button{font:inherit;font-weight:700;font-size:14px;cursor:pointer;color:#fff;border:0;border-radius:10px;padding:10px 14px;background:linear-gradient(135deg,var(--blue),var(--garnet));transition:filter .15s,transform .1s}
+  button:hover{filter:brightness(1.25)}button:active{transform:scale(.96)}
+  button.ghost{background:#1a2347;border:1px solid #27325c}
+  button.gold{background:var(--gold);color:#201800}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .big{font-weight:800;font-size:46px;text-align:center;min-width:64px}
+  .scorebox{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px}
+  .logo-prev{width:56px;height:56px;border-radius:50%;background:#0c1126;border:1px solid #27325c;object-fit:contain;padding:4px}
+  #timeNow{font-weight:800;font-size:44px;text-align:center;margin:4px 0 8px}
+  .tbl{width:100%;border-collapse:collapse}
+  .tbl th{font-size:11px;color:#a8b8e6;font-weight:600;text-align:center}
+  .tbl td{padding:3px 2px}.tbl td input{padding:6px 7px;text-align:center}
+  .tbl td:nth-child(2) input{text-align:left;min-width:150px}
+  .tbl td.n{font-size:13px;color:#a8b8e6;text-align:center;width:26px}
+  .tbl button{padding:6px 9px}
+  .scroll{overflow-x:auto}
+  .toggles label{display:inline-flex;gap:6px;align-items:center;margin:4px 14px 4px 0;font-size:16px;color:#fff}
+  small.hint{color:#8fa0d6;display:block;margin-top:6px}
+  .warn{color:#ffb86b}
 </style>
 </head>
 <body>
-<h1>⚽ Match Control Panel</h1>
 
-<div class="grid">
-  <!-- Team 1 -->
-  <div class="card">
-    <h2>Team 1</h2>
-    <div class="team-header">
-      <div class="logo-preview" id="logo1-preview">🏳</div>
-      <div style="flex:1">
-        <label>Team Name</label>
-        <input type="text" id="team1-name" value="Team One" oninput="sync()">
-        <label>Formation</label>
-        <input type="text" id="team1-formation" value="4-3-3" oninput="sync()">
-      </div>
-    </div>
-    <label>Upload Logo</label>
-    <label class="upload-btn">📁 Choose Logo <input type="file" accept="image/*" style="display:none" onchange="loadLogo(event,1)"></label>
-    <label>Color</label>
-    <input type="color" id="team1-color" value="#1d9bf0" oninput="sync()" style="width:100%;height:36px;border-radius:8px;border:1px solid #333;background:#222;cursor:pointer;">
+<!-- ======================= OVERLAY ======================= -->
+<div id="stage">
+  <div id="score" class="glass">
+    <div class="side home"><div class="crest" id="hCrest"></div><div class="nm" id="hName"></div><div class="sc" id="hScore">0</div></div>
+    <div class="mid"><div id="comp"></div><div><span id="clock">00:00</span><span id="added"></span></div><div id="period"></div></div>
+    <div class="side away"><div class="crest" id="aCrest"></div><div class="nm" id="aName"></div><div class="sc" id="aScore">0</div></div>
   </div>
 
-  <!-- Team 2 -->
-  <div class="card">
-    <h2>Team 2</h2>
-    <div class="team-header">
-      <div class="logo-preview" id="logo2-preview">🏳</div>
-      <div style="flex:1">
-        <label>Team Name</label>
-        <input type="text" id="team2-name" value="Team Two" oninput="sync()">
-        <label>Formation</label>
-        <input type="text" id="team2-formation" value="4-4-2" oninput="sync()">
-      </div>
-    </div>
-    <label>Upload Logo</label>
-    <label class="upload-btn">📁 Choose Logo <input type="file" accept="image/*" style="display:none" onchange="loadLogo(event,2)"></label>
-    <label>Color</label>
-    <input type="color" id="team2-color" value="#e63946" oninput="sync()" style="width:100%;height:36px;border-radius:8px;border:1px solid #333;background:#222;cursor:pointer;">
-  </div>
+  <div id="chat" class="glass alt"><iframe id="chatFrame" allowtransparency="true"></iframe></div>
 
-  <!-- Score -->
-  <div class="card">
-    <h2>Score</h2>
-    <div style="display:flex;gap:20px;align-items:center;justify-content:center;margin-top:4px;">
-      <div style="text-align:center;">
-        <div style="font-size:12px;color:#888;margin-bottom:4px;" id="s1-label">Team 1</div>
-        <div class="score-ctrl">
-          <button class="score-btn" onclick="changeScore(1,-1)">−</button>
-          <div class="score-display" id="score1">0</div>
-          <button class="score-btn" onclick="changeScore(1,1)">+</button>
-        </div>
-      </div>
-      <div style="font-size:28px;font-weight:700;color:#555;">:</div>
-      <div style="text-align:center;">
-        <div style="font-size:12px;color:#888;margin-bottom:4px;" id="s2-label">Team 2</div>
-        <div class="score-ctrl">
-          <button class="score-btn" onclick="changeScore(2,-1)">−</button>
-          <div class="score-display" id="score2">0</div>
-          <button class="score-btn" onclick="changeScore(2,1)">+</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Timer -->
-  <div class="card">
-    <h2>Timer</h2>
-    <div style="text-align:center;">
-      <div class="timer-display" id="timer-display">00:00</div>
-      <div class="timer-ctrl" style="justify-content:center;margin-top:12px;">
-        <button class="btn btn-green" onclick="startTimer()">▶ Start</button>
-        <button class="btn btn-red" onclick="stopTimer()">⏸ Pause</button>
-        <button class="btn btn-gray" onclick="resetTimer()">↺ Reset</button>
-      </div>
-      <div style="margin-top:10px;">
-        <label>Set minute</label>
-        <input type="number" id="timer-set" value="0" min="0" max="120" style="width:80px;text-align:center;">
-        <button class="btn btn-blue" style="margin-left:8px;padding:8px 12px;" onclick="setTimer()">Set</button>
-      </div>
+  <div id="right">
+    <div id="fixtures" class="glass"><div class="ttl">Upcoming games</div><div id="fxList"></div></div>
+    <div id="table" class="glass alt"><div class="ttl" id="tTitle">League table</div>
+      <table><thead><tr><th></th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead><tbody id="tBody"></tbody></table>
     </div>
   </div>
 </div>
 
-<!-- Lineups -->
-<div class="grid">
-  <div class="card">
-    <h2>Team 1 Lineup</h2>
-    <div id="lineup1"></div>
+<!-- ======================= CONTROL PANEL ======================= -->
+<div id="app">
+  <div class="top">
+    <div><h1>Overlay control</h1><span style="color:#a8b8e6">Every change goes live on the stream instantly.</span></div>
+    <span id="status">starting…</span>
+    <a href="index.html" target="_blank">Open overlay ↗</a>
   </div>
-  <div class="card">
-    <h2>Team 2 Lineup</h2>
-    <div id="lineup2"></div>
+
+  <div class="grid" id="ctl" style="display:none">
+    <div class="card wide">
+      <h2>Score</h2>
+      <div class="two">
+        <div>
+          <div class="row" style="margin-top:0"><img class="logo-prev" id="hPrev" alt=""><input type="file" id="hFile" accept="image/*"><button class="ghost" id="hClear">Remove logo</button></div>
+          <label>Home team name</label><input type="text" data-b="home.name">
+          <label>Short name (shown if no logo)</label><input type="text" data-b="home.short" maxlength="4">
+          <div class="scorebox"><button class="ghost" data-sc="home" data-d="-1">−1</button><div class="big" id="hS">0</div><button data-sc="home" data-d="1">Goal +1</button></div>
+        </div>
+        <div>
+          <div class="row" style="margin-top:0"><img class="logo-prev" id="aPrev" alt=""><input type="file" id="aFile" accept="image/*"><button class="ghost" id="aClear">Remove logo</button></div>
+          <label>Away team name</label><input type="text" data-b="away.name">
+          <label>Short name (shown if no logo)</label><input type="text" data-b="away.short" maxlength="4">
+          <div class="scorebox"><button class="ghost" data-sc="away" data-d="-1">−1</button><div class="big" id="aS">0</div><button data-sc="away" data-d="1">Goal +1</button></div>
+        </div>
+      </div>
+      <label>Competition label</label><input type="text" data-b="competition">
+      <div class="row"><button class="ghost" id="swap">Swap home / away</button><button class="ghost" id="zero">Reset score 0–0</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Match clock</h2>
+      <div id="timeNow">00:00</div>
+      <div class="row" style="justify-content:center">
+        <button id="tStart">Start / resume</button><button class="ghost" id="tPause">Pause</button><button class="ghost" id="tReset">Reset 00:00</button>
+      </div>
+      <label>Period label</label>
+      <select data-b="timer.period">
+        <option>1ST HALF</option><option>HALF TIME</option><option>2ND HALF</option><option>FULL TIME</option>
+        <option>EXTRA TIME 1</option><option>ET BREAK</option><option>EXTRA TIME 2</option><option>PENALTIES</option>
+      </select>
+      <label>Jump to a phase (sets the clock and starts it)</label>
+      <div class="row" style="margin-top:0">
+        <button class="ghost" data-jump="0|1ST HALF">Kick off 0:00</button>
+        <button class="ghost" data-jump="45|2ND HALF">2nd half 45:00</button>
+        <button class="ghost" data-jump="90|EXTRA TIME 1">Extra time 90:00</button>
+        <button class="ghost" data-jump="105|EXTRA TIME 2">ET 2nd half 105:00</button>
+      </div>
+      <label>Set the clock manually (min : sec)</label>
+      <div class="row" style="margin-top:0"><input type="number" id="setM" min="0" value="0" style="width:90px"><b>:</b><input type="number" id="setS" min="0" max="59" value="0" style="width:90px"><button class="ghost" id="tSet">Set</button></div>
+      <label>Added time (shown as +N next to the clock)</label>
+      <div class="row" style="margin-top:0"><button class="ghost" id="adMinus">−1</button><input type="number" data-b="timer.added" min="0" style="width:90px"><button class="ghost" id="adPlus">+1</button><button class="gold" id="adHide">Hide</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Show / hide on stream</h2>
+      <div class="toggles">
+        <label><input type="checkbox" data-c="show.score"> Scoreboard</label>
+        <label><input type="checkbox" data-c="show.table"> League table</label>
+        <label><input type="checkbox" data-c="show.fixtures"> Upcoming games</label>
+        <label><input type="checkbox" data-c="show.chat"> Chat box</label>
+      </div>
+      <h2 style="margin-top:20px">YouTube chat</h2>
+      <label>Paste your live link or video ID</label>
+      <input type="text" id="videoIn" placeholder="https://www.youtube.com/watch?v=… or yi3OMVSgsAc">
+      <small class="hint">Current video ID: <b id="videoNow"></b>. The Studio pop-out link can’t be embedded, so the overlay uses the public chat embed for the same video.</small>
+    </div>
+
+    <div class="card">
+      <h2>Upcoming games</h2>
+      <div class="scroll"><table class="tbl"><thead><tr><th>Home</th><th>Away</th><th>Date / time</th><th></th></tr></thead><tbody id="fxBody"></tbody></table></div>
+      <div class="row"><button class="ghost" id="fxAdd">+ Add game</button></div>
+    </div>
+
+    <div class="card wide">
+      <h2>League table</h2>
+      <div class="scroll"><table class="tbl"><thead><tr><th></th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th><th></th></tr></thead><tbody id="tBody2"></tbody></table></div>
+      <div class="row"><button class="ghost" id="tAdd">+ Add row</button><button class="gold" id="tSort">Sort by points, then GD</button><button class="ghost" id="tReset2">Reset to 8 Nov table</button></div>
+      <small class="hint">Any club with “Barc” in its name is highlighted on the overlay.</small>
+    </div>
   </div>
 </div>
-
-<button class="save-btn" onclick="saveAll()">💾 Save & Update Overlay</button>
-<div class="status" id="status">✅ Overlay updated!</div>
 
 <script>
-let score = [0, 0];
-let timerSec = 0;
-let timerInterval = null;
-let data = { team1:{name:'Team One',logo:'',color:'#1d9bf0',formation:'4-3-3',players:[]}, team2:{name:'Team Two',logo:'',color:'#e63946',formation:'4-4-2',players:[]}, score:[0,0], timer:0 };
-let playerPics = [{}, {}];
+/* ---------------------------------------------------------------
+   SETUP: paste your Firebase Realtime Database URL here so the
+   control page can update the overlay from any device, e.g.
+   "https://my-overlay-default-rtdb.europe-west1.firebasedatabase.app"
+   Leave empty for local-only mode (same browser only).
+---------------------------------------------------------------- */
+const FIREBASE_URL = "https://score-15512-default-rtdb.firebaseio.com";
 
-function buildLineups() {
-  [1,2].forEach(t => {
-    const el = document.getElementById('lineup' + t);
-    el.innerHTML = '';
-    for(let i=0;i<11;i++) {
-      const row = document.createElement('div');
-      row.className = 'player-row';
-      const stored = (t===1?data.team1:data.team2).players[i] || {};
-      const picDiv = document.createElement('div');
-      picDiv.className = 'player-pic';
-      picDiv.id = 'ppic-' + t + '-' + i;
-      picDiv.innerHTML = playerPics[t-1][i] ? '<img src="'+playerPics[t-1][i]+'">' : (i+1);
-      picDiv.onclick = (()=>{const ti=t,ii=i; return ()=>triggerPicUpload(ti,ii);})();
-      const numDiv = document.createElement('div');
-      numDiv.className = 'player-num';
-      numDiv.textContent = i+1;
-      const inp = document.createElement('input');
-      inp.type = 'text';
-      inp.placeholder = 'Player ' + (i+1);
-      inp.value = stored.name || '';
-      inp.oninput = (()=>{const ti=t,ii=i;return e=>{if(ti===1){if(!data.team1.players[ii])data.team1.players[ii]={};data.team1.players[ii].name=e.target.value;}else{if(!data.team2.players[ii])data.team2.players[ii]={};data.team2.players[ii].name=e.target.value;}};})();
-      row.appendChild(picDiv);
-      row.appendChild(numDiv);
-      row.appendChild(inp);
-      el.appendChild(row);
+/* ===================== shared state + sync ===================== */
+const Sync = (() => {
+  const p = new URLSearchParams(location.search);
+  const db = (p.get('db') || FIREBASE_URL || '').replace(/\/$/, '');
+  const url = db ? db + '/overlay.json' : null;
+  const bc = 'BroadcastChannel' in window ? new BroadcastChannel('stream-overlay') : null;
+
+  // La Liga 2026/27 after matchday 11, plus the three matchday-12 results played by 7 Nov
+  // (Sevilla 0-0 Alavés, Málaga 1-2 Racing, Valencia 0-3 Real Madrid). Sources: VAVEL, LaLiga.com
+  const seed = [
+    ['Barcelona',11,10,0,1,'+34',30],['Real Madrid',12,10,0,2,'+21',30],['Atlético Madrid',11,9,1,1,'+14',28],
+    ['Real Betis',11,7,2,2,'+3',23],['Real Sociedad',11,6,1,4,'0',19],['Sevilla',12,5,3,4,'-2',18],
+    ['Athletic Club',10,4,3,3,'+4',15],['Racing Santander',12,4,2,6,'-13',14],['Alavés',12,3,4,5,'-2',13],
+    ['Villarreal',11,3,3,5,'0',12],['Celta Vigo',11,2,6,3,'0',12],['Rayo Vallecano',10,3,3,4,'-5',12],
+    ['Getafe',11,3,3,5,'-8',12],['Deportivo',10,2,5,3,'0',11],['Espanyol',11,3,2,6,'-1',11],
+    ['Osasuna',10,3,2,5,'-10',11],['Elche',11,2,4,5,'-4',10],['Levante',11,2,4,5,'-5',10],
+    ['Valencia',12,2,3,7,'-12',9],['Málaga',12,0,5,7,'-14',5]
+  ];
+  const seedTable = () => seed.map(r => ({ team: r[0], p: String(r[1]), w: String(r[2]), d: String(r[3]), l: String(r[4]), gd: r[5], pts: String(r[6]) }));
+
+  const defaults = {
+    home: { name: 'ATLÉTICO MADRID', short: 'ATM', logo: '', score: 0 },
+    away: { name: 'FC BARCELONA', short: 'FCB', logo: '', score: 0 },
+    timer: { running: false, base: 0, startedAt: 0, period: '1ST HALF', added: 0 },
+    competition: 'LALIGA · MATCHDAY 12',
+    table: seedTable(),
+    fixtures: [
+      { home: 'Atlético Madrid', away: 'FC Barcelona', date: 'Today 20:00' },
+      { home: 'FC Barcelona', away: 'Villarreal', date: 'Sun 22 Nov 13:00' }
+    ],
+    videoId: 'yi3OMVSgsAc',
+    show: { score: true, table: true, fixtures: true, chat: true }
+  };
+
+  const clone = o => JSON.parse(JSON.stringify(o));
+  function merge(def, d) {
+    if (d == null) return clone(def);
+    if (Array.isArray(def)) return Array.isArray(d) ? d : Object.values(d || {});
+    if (typeof def === 'object') {
+      const o = {};
+      for (const k in def) o[k] = (Array.isArray(def[k]) && d[k] == null) ? [] : merge(def[k], d[k]);
+      return o;
     }
-  });
-}
-
-function triggerPicUpload(team, idx) {
-  const inp = document.createElement('input');
-  inp.type = 'file';
-  inp.accept = 'image/*';
-  inp.onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      playerPics[team-1][idx] = ev.target.result;
-      const el = document.getElementById('ppic-'+team+'-'+idx);
-      el.innerHTML = '<img src="'+ev.target.result+'">';
-      if(team===1){if(!data.team1.players[idx])data.team1.players[idx]={};data.team1.players[idx].pic=ev.target.result;}
-      else{if(!data.team2.players[idx])data.team2.players[idx]={};data.team2.players[idx].pic=ev.target.result;}
-    };
-    reader.readAsDataURL(file);
-  };
-  inp.click();
-}
-
-function loadLogo(e, team) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const preview = document.getElementById('logo'+team+'-preview');
-    preview.innerHTML = '<img src="'+ev.target.result+'">';
-    if(team===1) data.team1.logo = ev.target.result;
-    else data.team2.logo = ev.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function changeScore(team, delta) {
-  score[team-1] = Math.max(0, score[team-1] + delta);
-  document.getElementById('score'+team).textContent = score[team-1];
-  data.score = [...score];
-}
-
-function startTimer() {
-  if (timerInterval) return;
-  timerInterval = setInterval(() => {
-    timerSec++;
-    data.timer = timerSec;
-    updateTimerDisplay();
-  }, 1000);
-}
-function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
-function resetTimer() { stopTimer(); timerSec = 0; data.timer = 0; updateTimerDisplay(); }
-function setTimer() { timerSec = parseInt(document.getElementById('timer-set').value||0)*60; data.timer = timerSec; updateTimerDisplay(); }
-function updateTimerDisplay() {
-  const m = Math.floor(timerSec/60);
-  const s = timerSec%60;
-  document.getElementById('timer-display').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-}
-
-function sync() {
-  data.team1.name = document.getElementById('team1-name').value;
-  data.team2.name = document.getElementById('team2-name').value;
-  data.team1.formation = document.getElementById('team1-formation').value;
-  data.team2.formation = document.getElementById('team2-formation').value;
-  data.team1.color = document.getElementById('team1-color').value;
-  data.team2.color = document.getElementById('team2-color').value;
-  document.getElementById('s1-label').textContent = data.team1.name;
-  document.getElementById('s2-label').textContent = data.team2.name;
-}
-
-function saveAll() {
-  sync();
-  for(let i=0;i<11;i++){
-    const v1 = document.querySelector('#lineup1 .player-row:nth-child('+(i+1)+') input');
-    const v2 = document.querySelector('#lineup2 .player-row:nth-child('+(i+1)+') input');
-    if(!data.team1.players[i]) data.team1.players[i]={};
-    if(!data.team2.players[i]) data.team2.players[i]={};
-    if(v1) data.team1.players[i].name = v1.value;
-    if(v2) data.team2.players[i].name = v2.value;
-    if(playerPics[0][i]) data.team1.players[i].pic = playerPics[0][i];
-    if(playerPics[1][i]) data.team2.players[i].pic = playerPics[1][i];
+    return d;
   }
-  localStorage.setItem('matchData', JSON.stringify(data));
-  const s = document.getElementById('status');
-  s.style.display = 'block';
-  setTimeout(()=>s.style.display='none', 2000);
+  function setStatus(ok) {
+    const el = document.getElementById('status');
+    if (el) { el.textContent = ok ? 'LIVE · connected' : 'OFFLINE · check database URL'; el.className = ok ? 'ok' : 'bad'; }
+  }
+  async function save(state) {
+    try { localStorage.setItem('stream-state', JSON.stringify(state)); } catch (e) {}
+    if (bc) bc.postMessage(state);
+    if (url) { try { await fetch(url, { method: 'PUT', body: JSON.stringify(state) }); setStatus(true); } catch (e) { setStatus(false); } }
+  }
+  async function load() {
+    if (url) { try { const d = await (await fetch(url)).json(); setStatus(true); if (d) return d; } catch (e) { setStatus(false); } }
+    try { return JSON.parse(localStorage.getItem('stream-state')); } catch (e) { return null; }
+  }
+  function listen(cb) {
+    try { const l = localStorage.getItem('stream-state'); if (l) cb(JSON.parse(l)); } catch (e) {}
+    if (bc) bc.onmessage = e => cb(e.data);
+    addEventListener('storage', e => { if (e.key === 'stream-state' && e.newValue) cb(JSON.parse(e.newValue)); });
+    if (url) {
+      const es = new EventSource(url);
+      es.addEventListener('put', e => { const m = JSON.parse(e.data); if (m.path === '/' && m.data) cb(m.data); });
+    }
+  }
+  return { defaults, merge, save, load, listen, seedTable, online: !!url, setStatus };
+})();
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const CONTROL = new URLSearchParams(location.search).has('control') || /control\.html$/i.test(location.pathname);
+document.body.className = CONTROL ? 'control' : 'overlay';
+
+/* ===================== OVERLAY ===================== */
+if (!CONTROL) {
+  let S = Sync.merge(Sync.defaults, null), lastVideo = null;
+  const fit = () => { $('stage').style.transform = `scale(${Math.min(innerWidth / 1920, innerHeight / 1080)})`; };
+  addEventListener('resize', fit); fit();
+
+  const crest = (el, t) => { el.innerHTML = t.logo ? `<img src="${esc(t.logo)}" alt="">` : esc((t.short || '').slice(0, 3)); };
+  const setScore = (id, v) => {
+    const el = $(id), n = String(v ?? 0);
+    if (el.textContent !== n) { el.textContent = n; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+  };
+
+  function render() {
+    $('hName').textContent = S.home.name; $('aName').textContent = S.away.name;
+    crest($('hCrest'), S.home); crest($('aCrest'), S.away);
+    setScore('hScore', S.home.score); setScore('aScore', S.away.score);
+    $('comp').textContent = S.competition; $('period').textContent = S.timer.period;
+    const ad = Number(S.timer.added) || 0; $('added').textContent = ad > 0 ? '+' + ad : '';
+    $('tTitle').textContent = 'League table';
+    $('tBody').innerHTML = S.table.map((r, i) =>
+      `<tr class="${/barc|barç/i.test(r.team) ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.team)}</td><td>${esc(r.p)}</td><td>${esc(r.w)}</td><td>${esc(r.d)}</td><td>${esc(r.l)}</td><td>${esc(r.gd)}</td><td>${esc(r.pts)}</td></tr>`).join('');
+    $('fxList').innerHTML = S.fixtures.map(f =>
+      `<div class="fx"><span>${esc(f.home)} <b style="color:var(--gold)">v</b> ${esc(f.away)}</span><small>${esc(f.date)}</small></div>`).join('');
+
+    if (S.videoId !== lastVideo) {
+      lastVideo = S.videoId;
+      const f = $('chatFrame');
+      if (S.videoId && location.hostname) f.src = `https://www.youtube.com/live_chat?v=${encodeURIComponent(S.videoId)}&embed_domain=${location.hostname}&dark_theme=1`;
+      else f.removeAttribute('src');
+    }
+    const sh = S.show;
+    $('score').classList.toggle('hide', !sh.score);
+    $('table').classList.toggle('hide', !sh.table);
+    $('fixtures').classList.toggle('hide', !sh.fixtures);
+    $('chat').classList.toggle('hide', !(sh.chat && S.videoId));
+  }
+  function tick() {
+    const t = S.timer, e = Math.max(0, Math.floor(t.base + (t.running ? (Date.now() - t.startedAt) / 1000 : 0)));
+    $('clock').textContent = String(Math.floor(e / 60)).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0');
+  }
+  setInterval(tick, 250);
+  Sync.listen(d => { S = Sync.merge(Sync.defaults, d); render(); tick(); });
+  render(); tick();
 }
 
-buildLineups();
-sync();
-setInterval(saveAll, 5000);
+/* ===================== CONTROL ===================== */
+if (CONTROL) {
+  let S, timer;
+  const getP = (o, p) => p.split('.').reduce((a, k) => a && a[k], o);
+  const setP = (o, p, v) => { const k = p.split('.'), l = k.pop(); k.reduce((a, x) => a[x], o)[l] = v; };
+  const publish = () => { clearTimeout(timer); timer = setTimeout(() => Sync.save(S), 100); };
+  const elapsed = () => S.timer.base + (S.timer.running ? (Date.now() - S.timer.startedAt) / 1000 : 0);
+
+  Sync.load().then(d => { S = Sync.merge(Sync.defaults, d); init(); });
+
+  function init() {
+    $('ctl').style.display = '';
+    if (!Sync.online) { const s = $('status'); s.textContent = 'LOCAL ONLY · add Firebase URL in the file'; s.className = 'bad'; }
+
+    document.querySelectorAll('[data-b]').forEach(el => {
+      el.value = getP(S, el.dataset.b) ?? '';
+      el.addEventListener('input', () => { setP(S, el.dataset.b, el.type === 'number' ? Number(el.value) : el.value); refresh(); publish(); });
+    });
+    document.querySelectorAll('[data-c]').forEach(el => {
+      el.checked = !!getP(S, el.dataset.c);
+      el.addEventListener('change', () => { setP(S, el.dataset.c, el.checked); publish(); });
+    });
+    document.querySelectorAll('[data-sc]').forEach(b => b.onclick = () => {
+      const t = S[b.dataset.sc]; t.score = Math.max(0, (Number(t.score) || 0) + Number(b.dataset.d)); refresh(); publish();
+    });
+    $('swap').onclick = () => { [S.home, S.away] = [S.away, S.home]; document.querySelectorAll('[data-b^="home."],[data-b^="away."]').forEach(el => el.value = getP(S, el.dataset.b)); refresh(); publish(); };
+    $('zero').onclick = () => { S.home.score = 0; S.away.score = 0; refresh(); publish(); };
+
+    [['h', 'home'], ['a', 'away']].forEach(([k, side]) => {
+      $(k + 'File').onchange = e => { const f = e.target.files[0]; if (f) shrink(f).then(u => { S[side].logo = u; refresh(); publish(); }); };
+      $(k + 'Clear').onclick = () => { S[side].logo = ''; refresh(); publish(); };
+    });
+
+    $('tStart').onclick = () => { if (!S.timer.running) { S.timer.startedAt = Date.now(); S.timer.running = true; publish(); } };
+    $('tPause').onclick = () => { if (S.timer.running) { S.timer.base = elapsed(); S.timer.running = false; publish(); } };
+    $('tReset').onclick = () => { S.timer.base = 0; S.timer.running = false; S.timer.added = 0; S.timer.period = '1ST HALF'; syncFields(); publish(); };
+    $('tSet').onclick = () => { S.timer.base = (Number($('setM').value) || 0) * 60 + (Number($('setS').value) || 0); S.timer.startedAt = Date.now(); publish(); };
+    document.querySelectorAll('[data-jump]').forEach(b => b.onclick = () => {
+      const [m, per] = b.dataset.jump.split('|');
+      S.timer.base = Number(m) * 60; S.timer.startedAt = Date.now(); S.timer.running = true; S.timer.period = per; S.timer.added = 0; syncFields(); publish();
+    });
+    $('adPlus').onclick = () => { S.timer.added = (Number(S.timer.added) || 0) + 1; syncFields(); publish(); };
+    $('adMinus').onclick = () => { S.timer.added = Math.max(0, (Number(S.timer.added) || 0) - 1); syncFields(); publish(); };
+    $('adHide').onclick = () => { S.timer.added = 0; syncFields(); publish(); };
+
+    $('videoIn').oninput = e => {
+      const v = e.target.value.trim();
+      const m = v.match(/[?&]v=([\w-]{11})/) || v.match(/(?:youtu\.be\/|live\/|embed\/)([\w-]{11})/) || v.match(/^([\w-]{11})$/);
+      if (m) { S.videoId = m[1]; refresh(); publish(); }
+    };
+
+    $('fxAdd').onclick = () => { S.fixtures.push({ home: '', away: '', date: '' }); renderFx(); publish(); };
+    $('tAdd').onclick = () => { S.table.push({ team: '', p: '0', w: '0', d: '0', l: '0', gd: '0', pts: '0' }); renderTable(); publish(); };
+    $('tReset2').onclick = () => { if (confirm('Replace the table with the 8 Nov version?')) { S.table = Sync.seedTable(); renderTable(); publish(); } };
+    $('tSort').onclick = () => {
+      const n = v => parseInt(String(v).replace('+', ''), 10) || 0;
+      S.table.sort((a, b) => n(b.pts) - n(a.pts) || n(b.gd) - n(a.gd)); renderTable(); publish();
+    };
+
+    renderFx(); renderTable(); refresh(); syncFields();
+    setInterval(() => { const e = Math.max(0, Math.floor(elapsed())); $('timeNow').textContent = String(Math.floor(e / 60)).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0'); }, 250);
+  }
+
+  const blank = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+  function syncFields() { document.querySelectorAll('[data-b^="timer."]').forEach(el => el.value = getP(S, el.dataset.b)); }
+  function refresh() {
+    $('hS').textContent = S.home.score; $('aS').textContent = S.away.score;
+    $('hPrev').src = S.home.logo || blank; $('aPrev').src = S.away.logo || blank;
+    $('videoNow').textContent = S.videoId || 'none';
+  }
+  function shrink(file) {
+    return new Promise(res => {
+      const img = new Image(), r = new FileReader();
+      r.onload = () => { img.onload = () => {
+        const sc = Math.min(1, 160 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas'); c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); res(c.toDataURL('image/png'));
+      }; img.src = r.result; };
+      r.readAsDataURL(file);
+    });
+  }
+  const inp = (v, on, ph = '') => { const i = document.createElement('input'); i.type = 'text'; i.value = v ?? ''; i.placeholder = ph; i.oninput = () => { on(i.value); publish(); }; return i; };
+  const cell = c => { const td = document.createElement('td'); td.appendChild(c); return td; };
+  const delBtn = fn => { const b = document.createElement('button'); b.className = 'ghost'; b.textContent = '✕'; b.onclick = fn; return b; };
+
+  function renderFx() {
+    const b = $('fxBody'); b.innerHTML = '';
+    S.fixtures.forEach((f, i) => {
+      const tr = document.createElement('tr');
+      tr.append(cell(inp(f.home, v => f.home = v)), cell(inp(f.away, v => f.away = v)), cell(inp(f.date, v => f.date = v, 'Sat 20:00')),
+        cell(delBtn(() => { S.fixtures.splice(i, 1); renderFx(); publish(); })));
+      b.appendChild(tr);
+    });
+  }
+  function renderTable() {
+    const b = $('tBody2'); b.innerHTML = '';
+    S.table.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      const n = document.createElement('td'); n.className = 'n'; n.textContent = i + 1; tr.appendChild(n);
+      tr.appendChild(cell(inp(r.team, v => r.team = v)));
+      ['p', 'w', 'd', 'l', 'gd', 'pts'].forEach(k => { const c = cell(inp(r[k], v => r[k] = v)); c.firstChild.style.width = '58px'; tr.appendChild(c); });
+      tr.appendChild(cell(delBtn(() => { S.table.splice(i, 1); renderTable(); publish(); })));
+      b.appendChild(tr);
+    });
+  }
+}
 </script>
 </body>
 </html>
