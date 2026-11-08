@@ -91,6 +91,12 @@
   .tint.r{right:0;border-radius:0 26px 26px 0;background:radial-gradient(120% 140% at 100% 50%,var(--ac,transparent),transparent 70%)}
   tr.me td{background:linear-gradient(90deg,var(--r1,rgba(0,77,152,.85)),var(--r2,rgba(165,0,68,.75)))}
 
+  /* ================= REACTION PAGE ================= */
+  body.reaction{overflow:hidden;background:transparent}
+  body.reaction #app,body.reaction #score,body.reaction #right,body.reaction #bg,body.reaction #startCard{display:none}
+  body:not(.reaction) #camFrame{display:none}
+  .frame{background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
   /* ================= STARTING PAGE ================= */
   body.overlay #bg,body.overlay #startCard{display:none}
   body.starting #score,body.starting #right{display:none}
@@ -158,6 +164,7 @@
 
   <div id="chat" class="glass alt"></div>
   <div id="cta" class="glass"><span id="ctaText"></span></div>
+  <div id="camFrame" class="glass frame alt" style="position:absolute"></div>
 
   <div id="right">
     <div id="fixtures" class="glass"><div class="ttl">Games</div><div id="fxList"></div></div>
@@ -172,7 +179,7 @@
   <div class="top">
     <div><h1>Overlay control</h1><span style="color:#a8b8e6">Every change goes live on the stream instantly.</span></div>
     <span id="status">starting…</span>
-    <a href="index.html" target="_blank">Open overlay ↗</a><a href="starting.html" target="_blank">Open starting page ↗</a>
+    <a href="index.html" target="_blank">Open overlay ↗</a><a href="starting.html" target="_blank">Open starting page ↗</a><a href="reaction.html" target="_blank">Open reaction page ↗</a>
   </div>
 
   <div class="grid" id="ctl" style="display:none">
@@ -278,6 +285,23 @@
     </div>
 
     <div class="card wide">
+      <h2>Reaction scene (chat under the camera) <a href="reaction.html" target="_blank" style="font-size:13px;font-weight:600;margin-left:8px">Open page ↗</a></h2>
+      <div class="two">
+        <div>
+          <label>Camera position X / Y (px on the 1920 × 1080 canvas)</label>
+          <div class="row" style="margin-top:0"><input type="number" data-b="rx.camX" style="width:110px"><input type="number" data-b="rx.camY" style="width:110px"></div>
+          <label>Camera width / height</label>
+          <div class="row" style="margin-top:0"><input type="number" data-b="rx.camW" style="width:110px"><input type="number" data-b="rx.camH" style="width:110px"></div>
+        </div>
+        <div>
+          <label>Chat height (the chat copies the camera’s width and X)</label><input type="number" data-b="rx.chatH">
+          <div class="toggles" style="margin-top:10px"><label><input type="checkbox" data-c="rx.frame"> Glass frame around camera</label><label><input type="checkbox" data-c="rx.chat"> Chat box</label><label><input type="checkbox" data-c="rx.cta"> Subscribe pop-up</label></div>
+        </div>
+      </div>
+      <small class="hint" id="rxInfo"></small>
+    </div>
+
+    <div class="card wide">
       <h2>Starting-soon page <a href="starting.html" target="_blank" style="font-size:13px;font-weight:600;margin-left:8px">Open page ↗</a></h2>
       <div class="two">
         <div>
@@ -354,7 +378,8 @@ const Sync = (() => {
     liveTable: true,
     cta: { first: 'Subscribe to the channel', second: 'Like the stream', cycle: 180 },
     show: { score: true, table: true, fixtures: true, chat: true, cta: true },
-    start: { title: 'STARTING SOON', end: 'CHAAAAAAAT', duration: 300, left: 300, running: false, endAt: 0, chat: true, cta: true, media: { type: '', src: '', up: 0 } }
+    start: { title: 'STARTING SOON', end: 'CHAAAAAAAT', duration: 300, left: 300, running: false, endAt: 0, chat: true, cta: true, media: { type: '', src: '', up: 0 } },
+    rx: { camX: 1252, camY: 22, camW: 610, camH: 340, chatH: 500, frame: true, chat: true, cta: true }
   };
 
   const clone = o => JSON.parse(JSON.stringify(o));
@@ -407,7 +432,8 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const QS = new URLSearchParams(location.search);
 const CONTROL = QS.has('control') || /control\.html$/i.test(location.pathname);
 const START = !CONTROL && (QS.has('starting') || /starting\.html$/i.test(location.pathname));
-document.body.className = CONTROL ? 'control' : START ? 'starting' : 'overlay';
+const REACT = !CONTROL && !START && (QS.has('reaction') || /reaction\.html$/i.test(location.pathname));
+document.body.className = CONTROL ? 'control' : START ? 'starting' : REACT ? 'reaction' : 'overlay';
 const fmtT = s => { s = Math.max(0, Math.ceil(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return (h ? h + ':' : '') + p(m) + ':' + p(x); };
 
 const Live = (() => {
@@ -517,7 +543,7 @@ if (!CONTROL) {
   }
   function ctaLoop() {
     const next = () => setTimeout(ctaLoop, Math.max(20, Number(S.cta.cycle) || 180) * 1000);
-    if (!(START ? S.start.cta : S.show.cta)) return next();
+    if (!(START ? S.start.cta : REACT ? S.rx.cta : S.show.cta)) return next();
     showCta(S.cta.first, () => showCta(S.cta.second, next));
   }
   setTimeout(ctaLoop, 6000);
@@ -546,17 +572,25 @@ if (!CONTROL) {
     $('fxList').innerHTML = prevHtml + nextHtml;
     fitName($('hName')); fitName($('aName'));
 
-    const sh = START ? { score: true, table: true, fixtures: true, chat: S.start.chat, cta: true } : S.show;
+    const sh = START ? { score: true, table: true, fixtures: true, chat: S.start.chat, cta: true } : REACT ? { score: true, table: true, fixtures: true, chat: S.rx.chat, cta: true } : S.show;
     $('score').classList.toggle('hide', !sh.score);
     $('table').classList.toggle('hide', !sh.table);
     $('fixtures').classList.toggle('hide', !sh.fixtures);
     $('chat').classList.toggle('hide', !sh.chat);
     if (START) renderStart();
+    if (REACT) renderReact();
   }
   function tick() {
     if (START) tickStart();
     const t = S.timer, e = Math.max(0, Math.floor(t.base + (t.running ? (Date.now() - t.startedAt) / 1000 : 0)));
     $('clock').textContent = String(Math.floor(e / 60)).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0');
+  }
+  /* ---- reaction page: chat under the camera, same width ---- */
+  function renderReact() {
+    const r = S.rx, x = +r.camX, y = +r.camY, w = +r.camW, h = +r.camH, g = 20, ch = +r.chatH, cy = y + h + g;
+    const put = (el, a, b, c, d) => { el.style.left = a + 'px'; el.style.top = b + 'px'; el.style.width = c + 'px'; el.style.height = d + 'px'; };
+    put($('camFrame'), x, y, w, h); put($('chat'), x, cy, w, ch); put($('cta'), x, cy + ch + g, w, 64);
+    $('camFrame').classList.toggle('hide', !r.frame);
   }
   /* ---- starting-soon page ---- */
   let lastMedia = null;
@@ -660,6 +694,10 @@ if (CONTROL) {
     setInterval(() => { const e = Math.max(0, Math.floor(elapsed())); $('timeNow').textContent = String(Math.floor(e / 60)).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0'); }, 250);
   }
 
+  function rxInfo() {
+    const r = S.rx, cy = r.camY + r.camH + 20;
+    $('rxInfo').textContent = `Reaction page = Browser Source 1920 × 1080 at x 0, y 0, placed above your camera. Streamlabs chat widget on top of it: size ${r.camW - 16} × ${r.chatH - 16}, position x ${r.camX + 8}, y ${cy + 8}.` + (cy + r.chatH + 20 + 64 > 1080 ? ' ⚠ The subscribe pop-up would fall off the bottom — lower the chat height.' : '');
+  }
   const fillInputs = () => document.querySelectorAll('[data-b]').forEach(el => el.value = getP(S, el.dataset.b) ?? '');
   const readURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
   const shrinkBg = f => readURL(f).then(u => new Promise((res, rej) => { const i = new Image(); i.onload = () => {
@@ -723,6 +761,7 @@ if (CONTROL) {
     $('hS').textContent = S.home.score; $('aS').textContent = S.away.score;
     [['home', 'h'], ['away', 'a']].forEach(([side, k]) => { const key = tk(S[side]), e = $(k + 'Prev');
       e.textContent = (S[side].short || '').slice(0, 3); e.style.cssText = crestCss(key); $(k + 'Sel').value = TEAMS[key] ? key : ''; });
+    rxInfo();
   }
   function shrink(file) {
     return new Promise(res => {
