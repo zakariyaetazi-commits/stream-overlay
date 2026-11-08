@@ -14,7 +14,8 @@
   body.overlay{overflow:hidden;background:transparent}
   body.control{background:radial-gradient(1200px 600px at 10% -10%,rgba(0,77,152,.45),transparent),radial-gradient(900px 500px at 100% 0,rgba(165,0,68,.4),transparent),#0a0d1a;padding:20px;min-height:100vh;height:auto}
   body.control #stage{display:none}
-  body.overlay #app{display:none}
+  body.overlay #app,body.starting #app{display:none}
+  body.starting{overflow:hidden;background:#000}
 
   /* ================= OVERLAY ================= */
   #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
@@ -84,6 +85,29 @@
     opacity:0;transform:translateY(16px) scale(.96);pointer-events:none;border-radius:32px}
   #cta.on{opacity:1;transform:none}
 
+  .crest{text-shadow:0 1px 3px rgba(0,0,0,.35)}
+  .tint{position:absolute;top:0;bottom:0;width:46%;z-index:-1;pointer-events:none;opacity:.6}
+  .tint.l{left:0;border-radius:26px 0 0 26px;background:radial-gradient(120% 140% at 0 50%,var(--hc,transparent),transparent 70%)}
+  .tint.r{right:0;border-radius:0 26px 26px 0;background:radial-gradient(120% 140% at 100% 50%,var(--ac,transparent),transparent 70%)}
+  tr.me td{background:linear-gradient(90deg,var(--r1,rgba(0,77,152,.85)),var(--r2,rgba(165,0,68,.75)))}
+
+  /* ================= STARTING PAGE ================= */
+  body.overlay #bg,body.overlay #startCard{display:none}
+  body.starting #score,body.starting #right{display:none}
+  #bg{position:absolute;inset:0;overflow:hidden;background:#070a16}
+  #bg .m{position:absolute;left:-60px;top:-60px;width:calc(100% + 120px);height:calc(100% + 120px);object-fit:cover;filter:blur(48px)}
+  #bgFill{position:absolute;inset:-60px;filter:blur(48px);
+    background:radial-gradient(1100px 650px at 12% 0,rgba(0,77,152,.75),transparent),radial-gradient(900px 600px at 100% 10%,rgba(165,0,68,.7),transparent),radial-gradient(800px 500px at 50% 115%,rgba(237,187,0,.28),transparent),#080b18}
+  #startCard{position:absolute;left:510px;top:310px;width:900px;height:430px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 40px}
+  #sTitle{font-weight:800;letter-spacing:10px;font-size:40px;color:var(--gold);white-space:nowrap}
+  #sTime{font-weight:800;font-size:200px;line-height:1.05;letter-spacing:4px}
+  #sBar{width:560px;height:8px;border-radius:8px;background:rgba(255,255,255,.14);margin-top:14px;overflow:hidden}
+  #sBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue2),var(--garnet),var(--gold));transition:width .3s linear}
+  #startCard.done #sTime,#startCard.done #sBar{display:none}
+  #startCard.done #sTitle{font-size:130px;letter-spacing:6px;color:#fff;text-shadow:0 0 30px rgba(237,187,0,.7),0 0 60px rgba(165,0,68,.6);animation:chatpulse 1.2s ease-in-out infinite alternate}
+  @keyframes chatpulse{from{transform:scale(1)}to{transform:scale(1.06)}}
+  .crest-prev{width:56px;height:56px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;font-size:18px;border:2px solid rgba(255,255,255,.35)}
+
   /* ================= CONTROL ================= */
   body.control{font-size:17px}
   h1{font-size:24px;font-weight:800;margin-bottom:2px}
@@ -107,7 +131,7 @@
   .big{font-weight:800;font-size:46px;text-align:center;min-width:64px}
   .scorebox{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px}
   .logo-prev{width:56px;height:56px;border-radius:50%;background:#0c1126;border:1px solid #27325c;object-fit:contain;padding:4px}
-  #timeNow{font-weight:800;font-size:44px;text-align:center;margin:4px 0 8px}
+  #timeNow,#stNow{font-weight:800;font-size:44px;text-align:center;margin:4px 0 8px}
   .tbl{width:100%;border-collapse:collapse}
   .tbl th{font-size:11px;color:#a8b8e6;font-weight:600;text-align:center}
   .tbl td{padding:3px 2px}.tbl td input{padding:6px 7px;text-align:center}
@@ -124,7 +148,9 @@
 
 <!-- ======================= OVERLAY ======================= -->
 <div id="stage">
-  <div id="score" class="glass">
+  <div id="bg"><div id="bgFill"></div></div>
+  <div id="startCard" class="glass"><div id="sTitle"></div><div id="sTime">00:00</div><div id="sBar"><i></i></div></div>
+  <div id="score" class="glass"><i class="tint l"></i><i class="tint r"></i>
     <div class="side home"><div class="crest" id="hCrest"></div><div class="nm" id="hName"></div><div class="sc" id="hScore">0</div></div>
     <div class="mid"><div id="comp"></div><div><span id="clock">00:00</span><span id="added"></span></div><div id="period"></div></div>
     <div class="side away"><div class="crest" id="aCrest"></div><div class="nm" id="aName"></div><div class="sc" id="aScore">0</div></div>
@@ -146,23 +172,34 @@
   <div class="top">
     <div><h1>Overlay control</h1><span style="color:#a8b8e6">Every change goes live on the stream instantly.</span></div>
     <span id="status">starting…</span>
-    <a href="index.html" target="_blank">Open overlay ↗</a>
+    <a href="index.html" target="_blank">Open overlay ↗</a><a href="starting.html" target="_blank">Open starting page ↗</a>
   </div>
 
   <div class="grid" id="ctl" style="display:none">
     <div class="card wide">
+      <h2>Pick a game (Barcelona &amp; Real Madrid)</h2>
+      <div class="two">
+        <div><label>Club</label><select id="gClub"><option value="">Both clubs</option><option value="BAR">FC Barcelona</option><option value="RMA">Real Madrid</option></select></div>
+        <div><label>Competition</label><select id="gComp"><option value="">All</option><option value="L">LaLiga</option><option value="C">Champions League</option></select></div>
+      </div>
+      <label>Game</label><select id="gSel"></select>
+      <div class="row"><button class="gold" id="gLoad">Load this game on the overlay</button><button class="ghost" id="gNext">Load the next game</button></div>
+      <small class="hint">Loading a game fills both teams (name, short name, badge colours), the competition label, resets score and clock, and fills “Upcoming games” with that club’s next 3 fixtures. Times show in your local time zone; “no time” means the kick-off isn’t set yet. Copa del Rey, Supercopa and Champions League knockouts aren’t scheduled yet — use the team pickers below for those.</small>
+    </div>
+
+    <div class="card wide">
       <h2>Score</h2>
       <div class="two">
         <div>
-          <div class="row" style="margin-top:0"><img class="logo-prev" id="hPrev" alt=""><input type="file" id="hFile" accept="image/*"><button class="ghost" id="hClear">Remove logo</button></div>
+          <div class="row" style="margin-top:0"><span class="crest-prev" id="hPrev"></span><select id="hSel" style="flex:1"></select></div>
           <label>Home team name</label><input type="text" data-b="home.name">
-          <label>Short name (shown if no logo)</label><input type="text" data-b="home.short" maxlength="4">
+          <label>Short name (shown on the badge)</label><input type="text" data-b="home.short" maxlength="4">
           <div class="scorebox"><button class="ghost" data-sc="home" data-d="-1">−1</button><div class="big" id="hS">0</div><button data-sc="home" data-d="1">Goal +1</button></div>
         </div>
         <div>
-          <div class="row" style="margin-top:0"><img class="logo-prev" id="aPrev" alt=""><input type="file" id="aFile" accept="image/*"><button class="ghost" id="aClear">Remove logo</button></div>
+          <div class="row" style="margin-top:0"><span class="crest-prev" id="aPrev"></span><select id="aSel" style="flex:1"></select></div>
           <label>Away team name</label><input type="text" data-b="away.name">
-          <label>Short name (shown if no logo)</label><input type="text" data-b="away.short" maxlength="4">
+          <label>Short name (shown on the badge)</label><input type="text" data-b="away.short" maxlength="4">
           <div class="scorebox"><button class="ghost" data-sc="away" data-d="-1">−1</button><div class="big" id="aS">0</div><button data-sc="away" data-d="1">Goal +1</button></div>
         </div>
       </div>
@@ -241,6 +278,28 @@
     </div>
 
     <div class="card wide">
+      <h2>Starting-soon page <a href="starting.html" target="_blank" style="font-size:13px;font-weight:600;margin-left:8px">Open page ↗</a></h2>
+      <div class="two">
+        <div>
+          <div id="stNow">05:00</div>
+          <div class="row" style="justify-content:center"><button id="stStart">Start / resume</button><button class="ghost" id="stPause">Pause</button><button class="ghost" id="stReset">Reset</button></div>
+          <label>Countdown length (min : sec)</label>
+          <div class="row" style="margin-top:0"><input type="number" id="stM" min="0" value="5" style="width:90px"><b>:</b><input type="number" id="stS" min="0" max="59" value="0" style="width:90px"><button class="ghost" id="stSet">Set</button></div>
+          <div class="row"><button class="ghost" id="stMinus">−1 min</button><button class="ghost" id="stPlus">+1 min</button><button class="gold" id="stEnd">Skip to chat now</button></div>
+        </div>
+        <div>
+          <label>Text while counting down</label><input type="text" data-b="start.title">
+          <label>Text when it ends</label><input type="text" data-b="start.end">
+          <div class="toggles" style="margin-top:10px"><label><input type="checkbox" data-c="start.chat"> Chat box</label><label><input type="checkbox" data-c="start.cta"> Subscribe pop-up</label></div>
+        </div>
+      </div>
+      <label>Background picture or video (blurred at the same level as the widgets)</label>
+      <div class="row" style="margin-top:0"><input type="file" id="bgFile" accept="image/*,video/*"><button class="ghost" id="bgClear">Remove background</button></div>
+      <div class="row"><input type="text" id="bgUrl" placeholder="…or paste a direct link to a .jpg / .png / .mp4 / .webm" style="flex:1;min-width:260px"><button class="ghost" id="bgUse">Use link</button></div>
+      <small class="hint" id="bgMsg">Pictures are resized automatically. Video files up to 6 MB upload straight to your database; for bigger videos paste a direct link. The chat sits in the same spot as the main overlay (x 30, y 190), so your Streamlabs chat source doesn’t need to move.</small>
+    </div>
+
+    <div class="card wide">
       <h2>League table</h2>
       <div class="toggles"><label><input type="checkbox" data-c="liveTable"> Update the table live from the score (Home and Away teams)</label></div>
       <small class="hint">The rows below are the table before the match. The overlay adds the live score to them and re-ranks automatically.</small>
@@ -281,8 +340,8 @@ const Sync = (() => {
   const seedTable = () => seed.map(r => ({ team: r[0], p: String(r[1]), w: String(r[2]), d: String(r[3]), l: String(r[4]), gd: r[5], pts: String(r[6]) }));
 
   const defaults = {
-    home: { name: 'ATLÉTICO MADRID', short: 'ATM', logo: '', score: 0 },
-    away: { name: 'FC BARCELONA', short: 'FCB', logo: '', score: 0 },
+    home: { name: 'ATLÉTICO MADRID', short: 'ATM', key: 'ATM', score: 0 },
+    away: { name: 'FC BARCELONA', short: 'FCB', key: 'BAR', score: 0 },
     timer: { running: false, base: 0, startedAt: 0, period: '1ST HALF', added: 0 },
     competition: 'LALIGA · MATCHDAY 12',
     table: seedTable(),
@@ -294,7 +353,8 @@ const Sync = (() => {
     previous: { home: 'FC Barcelona', away: 'Alavés', hs: 6, as: 1, date: '31 Oct' },
     liveTable: true,
     cta: { first: 'Subscribe to the channel', second: 'Like the stream', cycle: 180 },
-    show: { score: true, table: true, fixtures: true, chat: true, cta: true }
+    show: { score: true, table: true, fixtures: true, chat: true, cta: true },
+    start: { title: 'STARTING SOON', end: 'CHAAAAAAAT', duration: 300, left: 300, running: false, endAt: 0, chat: true, cta: true, media: { type: '', src: '', up: 0 } }
   };
 
   const clone = o => JSON.parse(JSON.stringify(o));
@@ -330,13 +390,25 @@ const Sync = (() => {
       es.addEventListener('put', e => { const m = JSON.parse(e.data); if (m.path === '/' && m.data) cb(m.data); });
     }
   }
-  return { defaults, merge, save, load, listen, seedTable, online: !!url, setStatus };
+  const murl = db ? db + '/media.json' : null;
+  async function saveMedia(d) {
+    if (murl) { const r = await fetch(murl, { method: 'PUT', body: JSON.stringify(d) }); if (!r.ok) throw new Error('db'); }
+    else localStorage.setItem('stream-media', JSON.stringify(d));
+  }
+  async function loadMedia() {
+    if (murl) { try { return await (await fetch(murl)).json(); } catch (e) { return null; } }
+    try { return JSON.parse(localStorage.getItem('stream-media')); } catch (e) { return null; }
+  }
+  return { defaults, merge, save, load, listen, seedTable, saveMedia, loadMedia, online: !!url, setStatus };
 })();
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const CONTROL = new URLSearchParams(location.search).has('control') || /control\.html$/i.test(location.pathname);
-document.body.className = CONTROL ? 'control' : 'overlay';
+const QS = new URLSearchParams(location.search);
+const CONTROL = QS.has('control') || /control\.html$/i.test(location.pathname);
+const START = !CONTROL && (QS.has('starting') || /starting\.html$/i.test(location.pathname));
+document.body.className = CONTROL ? 'control' : START ? 'starting' : 'overlay';
+const fmtT = s => { s = Math.max(0, Math.ceil(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return (h ? h + ':' : '') + p(m) + ':' + p(x); };
 
 const Live = (() => {
   const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(fc|cf|cd|ud|rcd|ca)\b/g, '').replace(/\s+/g, ' ').trim();
@@ -364,8 +436,59 @@ const Live = (() => {
     add(t[h], hs, as); add(t[a], as, hs);
     return t.map((r, i) => ({ r, i })).sort((x, y) => num(y.r.pts) - num(x.r.pts) || num(y.r.gd) - num(x.r.gd) || x.i - y.i).map(o => o.r);
   }
-  return { apply, started };
+  return { apply, started, norm };
 })();
+
+/* ===================== teams (colours from each badge) + games ===================== */
+// [display name, short, colour 1, colour 2, text colour, badge style: s = stripes, o = disc with ring]
+const TEAMS = {
+  BAR:['FC Barcelona','FCB','#004D98','#A50044','#fff','s'], RMA:['Real Madrid','RMA','#FFFFFF','#FEBE10','#1B2A6B','o'],
+  ATM:['Atlético Madrid','ATM','#CB3524','#FFFFFF','#fff','s'], BET:['Real Betis','BET','#0BB363','#FFFFFF','#fff','s'],
+  RSO:['Real Sociedad','RSO','#0067B1','#FFFFFF','#fff','s'], SEV:['Sevilla','SEV','#FFFFFF','#D6001C','#D6001C','o'],
+  ATH:['Athletic Club','ATH','#EE2523','#FFFFFF','#fff','s'], RAC:['Racing Santander','RAC','#00A651','#FFFFFF','#fff','o'],
+  ALA:['Alavés','ALA','#0761AF','#FFFFFF','#fff','s'], VIL:['Villarreal','VIL','#FBE122','#005187','#005187','o'],
+  CEL:['Celta Vigo','CEL','#8AC3EE','#FFFFFF','#0B2E59','o'], RAY:['Rayo Vallecano','RAY','#FFFFFF','#E53027','#E53027','o'],
+  GET:['Getafe','GET','#005999','#FFFFFF','#fff','o'], DEP:['Deportivo','DEP','#0070B8','#FFFFFF','#fff','o'],
+  ESP:['Espanyol','ESP','#007FC8','#FFFFFF','#fff','s'], OSA:['Osasuna','OSA','#D91A21','#0A346F','#fff','o'],
+  ELC:['Elche','ELC','#00873E','#FFFFFF','#fff','s'], LEV:['Levante','LEV','#B4053F','#00529F','#fff','s'],
+  VAL:['Valencia','VAL','#FFFFFF','#FF8200','#111','o'], MAL:['Málaga','MAL','#0099DB','#FFFFFF','#fff','o'],
+  MCI:['Manchester City','MCI','#6CABDD','#1C2C5B','#fff','o'], ARS:['Arsenal','ARS','#EF0107','#FFFFFF','#fff','o'],
+  PSV:['PSV Eindhoven','PSV','#ED1C24','#FFFFFF','#fff','s'], SPO:['Sporting CP','SCP','#00805D','#FFFFFF','#fff','s'],
+  COM:['Como','COM','#0033A0','#FFFFFF','#fff','o'], LAS:['LASK','LAS','#111111','#FFFFFF','#fff','o'],
+  SHA:['Shakhtar Donetsk','SHA','#F58220','#111111','#fff','s'], SAB:['Sabah','SAB','#E4002B','#FFFFFF','#fff','o']
+};
+const lum = h => { const n = parseInt(h.slice(1), 16); return (.299 * (n >> 16) + .587 * ((n >> 8) & 255) + .114 * (n & 255)) / 255; };
+const rgba = (h, a) => { const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+const hl = k => { const t = TEAMS[k], d = [t[2], t[3]].filter(c => lum(c) < .6), a = d[0] || '#1B2A6B', b = d[1] || a; return [rgba(a, .85), rgba(b, .75)]; };
+const acc = k => { const t = TEAMS[k]; return t ? ([t[2], t[3]].find(c => lum(c) < .82) || t[3]) : null; };
+const crestCss = k => {
+  const t = TEAMS[k]; if (!t) return 'background:rgba(255,255,255,.12);color:#fff';
+  const [, , a, b, c, ty] = t;
+  return ty === 's' ? `background:linear-gradient(90deg,${a} 0 25%,${b} 25% 50%,${a} 50% 75%,${b} 75%);color:${c};text-shadow:0 0 4px rgba(0,0,0,.9),0 0 10px rgba(0,0,0,.6)`
+                    : `background:${a};color:${c};box-shadow:inset 0 0 0 7px ${b}`;
+};
+const keyOf = n => { const b = Live.norm(n); if (!b) return ''; const ks = Object.keys(TEAMS);
+  return ks.find(k => Live.norm(TEAMS[k][0]) === b) || ks.find(k => { const a = Live.norm(TEAMS[k][0]); return a.includes(b) || b.includes(a); }) || ''; };
+const tk = t => (t && t.key !== undefined && t.key !== null) ? t.key : keyOf(t && t.name);
+
+// date (UTC) [time] | home | away | L = LaLiga, C = Champions League | LaLiga matchday
+// Sources: laliga.com (Real Madrid), VAVEL (Barcelona), UEFA via club sites. Rows without a time have no kick-off set yet.
+const RAW = [
+'2026-11-08 20:00|ATM|BAR|L|12','2026-11-21 20:00|RMA|CEL|L|13','2026-11-22 13:00|BAR|VIL|L|13','2026-11-24 20:00|RMA|PSV|C|','2026-11-25 17:45|SAB|BAR|C|',
+'2026-11-28 20:00|RMA|ALA|L|14','2026-11-29|DEP|BAR|L|14','2026-12-02 18:00|RSO|RMA|L|23','2026-12-06|BAR|CEL|L|15','2026-12-06|ATH|RMA|L|15',
+'2026-12-08 20:00|BAR|MCI|C|','2026-12-09 20:00|ARS|RMA|C|','2026-12-13|MAL|BAR|L|16','2026-12-13|RMA|OSA|L|16','2026-12-20|BAR|RSO|L|17','2026-12-20|DEP|RMA|L|17',
+'2027-01-03|ESP|BAR|L|18','2027-01-03|RMA|GET|L|18','2027-01-10|OSA|BAR|L|19','2027-01-10|RMA|LEV|L|19','2027-01-17|BAR|ELC|L|20','2027-01-17|MAL|RMA|L|20',
+'2027-01-19 20:00|RMA|LAS|C|','2027-01-20 20:00|SPO|BAR|C|','2027-01-24|ALA|BAR|L|21','2027-01-24|RMA|BET|L|21','2027-01-27 20:00|BAR|COM|C|','2027-01-27 20:00|SHA|RMA|C|',
+'2027-01-31|BAR|VAL|L|22','2027-01-31|RAY|RMA|L|22','2027-02-07|BAR|ATM|L|23','2027-02-14|VIL|BAR|L|24','2027-02-14|RMA|ATH|L|24','2027-02-21|BAR|LEV|L|25','2027-02-21|SEV|RMA|L|25',
+'2027-02-28|RMA|VAL|L|26','2027-03-07|BAR|BET|L|27','2027-03-07|VIL|RMA|L|27','2027-03-14|BAR|DEP|L|28','2027-03-14|RMA|ESP|L|28','2027-03-21|RAY|BAR|L|29','2027-03-21|CEL|RMA|L|29',
+'2027-04-04|BAR|SEV|L|30','2027-04-04|RMA|ATM|L|30','2027-04-11|RAC|BAR|L|31','2027-04-11|OSA|RMA|L|31','2027-04-18|BAR|ESP|L|32','2027-04-18|GET|RMA|L|32',
+'2027-04-21|CEL|BAR|L|33','2027-04-21|RMA|ELC|L|33','2027-05-02|BAR|OSA|L|34','2027-05-02|LEV|RMA|L|34','2027-05-09|RMA|BAR|L|35','2027-05-16|RSO|BAR|L|36','2027-05-16|RMA|RAC|L|36',
+'2027-05-23|BAR|MAL|L|37','2027-05-23|ALA|RMA|L|37','2027-05-30|GET|BAR|L|38','2027-05-30|RMA|DEP|L|38'];
+const GAMES = RAW.map(r => { const [d, h, a, c, m] = r.split('|'), t = d.length > 10;
+  return { dt: d, h, a, c, md: m, t, ts: Date.parse(t ? d.replace(' ', 'T') + ':00Z' : d + 'T12:00:00Z') }; }).sort((x, y) => x.ts - y.ts);
+const fmt = g => { const d = new Date(g.ts - (g.t ? 0 : 0)); const z = g.t ? undefined : 'UTC';
+  let o = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: z }).replace(',', '');
+  if (g.t) o += ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }); return o; };
 
 const CHAT_CSS = `@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&display=swap');
 html, body { background: transparent !important; overflow: hidden; }
@@ -394,12 +517,12 @@ if (!CONTROL) {
   }
   function ctaLoop() {
     const next = () => setTimeout(ctaLoop, Math.max(20, Number(S.cta.cycle) || 180) * 1000);
-    if (!S.show.cta) return next();
+    if (!(START ? S.start.cta : S.show.cta)) return next();
     showCta(S.cta.first, () => showCta(S.cta.second, next));
   }
   setTimeout(ctaLoop, 6000);
 
-  const crest = (el, t) => { el.innerHTML = t.logo ? `<img src="${esc(t.logo)}" alt="">` : esc((t.short || '').slice(0, 3)); };
+  const crest = (el, t) => { el.textContent = (t.short || '').slice(0, 3); el.style.cssText = crestCss(tk(t)); };
   const setScore = (id, v) => {
     const el = $(id), n = String(v ?? 0);
     if (el.textContent !== n) { el.textContent = n; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
@@ -412,8 +535,10 @@ if (!CONTROL) {
     $('comp').textContent = S.competition; $('period').textContent = S.timer.period;
     const ad = Number(S.timer.added) || 0; $('added').textContent = ad > 0 ? '+' + ad : '';
     $('tTitle').textContent = 'League table';
-    $('tBody').innerHTML = Live.apply(S).map((r, i) =>
-      `<tr class="${/barc|barç/i.test(r.team) ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.team)}</td><td>${esc(r.p)}</td><td>${esc(r.w)}</td><td>${esc(r.d)}</td><td>${esc(r.l)}</td><td>${esc(r.gd)}</td><td>${esc(r.pts)}</td></tr>`).join('');
+    const tb = Live.apply(S), ks = tb.map(r => keyOf(r.team)), hk = tk(S.home), ak = tk(S.away), lv = ks.includes(hk) || ks.includes(ak);
+    $('score').style.setProperty('--hc', acc(hk) || 'transparent'); $('score').style.setProperty('--ac', acc(ak) || 'transparent');
+    $('tBody').innerHTML = tb.map((r, i) => { const k = ks[i], on = k && (lv ? (k === hk || k === ak) : (k === 'BAR' || k === 'RMA')), h = on ? hl(k) : null;
+      return `<tr class="${on ? 'me' : ''}"${on ? ` style="--r1:${h[0]};--r2:${h[1]}"` : ''}><td>${i + 1}</td><td>${esc(r.team)}</td><td>${esc(r.p)}</td><td>${esc(r.w)}</td><td>${esc(r.d)}</td><td>${esc(r.l)}</td><td>${esc(r.gd)}</td><td>${esc(r.pts)}</td></tr>`; }).join('');
     const pv = S.previous;
     const prevHtml = pv && pv.home ? `<div class="sub">Last game</div><div class="fx"><span>${esc(pv.home)}<b class="res">${esc(pv.hs)} – ${esc(pv.as)}</b>${esc(pv.away)}</span><small>${esc(pv.date)}</small></div>` : '';
     const nextHtml = S.fixtures.length ? `<div class="sub">${S.fixtures.length > 1 ? 'Next games' : 'Next game'}</div>` + S.fixtures.map(f =>
@@ -421,15 +546,48 @@ if (!CONTROL) {
     $('fxList').innerHTML = prevHtml + nextHtml;
     fitName($('hName')); fitName($('aName'));
 
-    const sh = S.show;
+    const sh = START ? { score: true, table: true, fixtures: true, chat: S.start.chat, cta: true } : S.show;
     $('score').classList.toggle('hide', !sh.score);
     $('table').classList.toggle('hide', !sh.table);
     $('fixtures').classList.toggle('hide', !sh.fixtures);
     $('chat').classList.toggle('hide', !sh.chat);
+    if (START) renderStart();
   }
   function tick() {
+    if (START) tickStart();
     const t = S.timer, e = Math.max(0, Math.floor(t.base + (t.running ? (Date.now() - t.startedAt) / 1000 : 0)));
     $('clock').textContent = String(Math.floor(e / 60)).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0');
+  }
+  /* ---- starting-soon page ---- */
+  let lastMedia = null;
+  function fitTitle() {
+    const el = $('sTitle'), max = $('startCard').clientWidth - 80; el.style.fontSize = '';
+    let sz = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollWidth > max && sz > 24) { sz -= 4; el.style.fontSize = sz + 'px'; }
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitle);
+  async function setMedia(m) {
+    const bg = $('bg'); bg.querySelectorAll('.m').forEach(e => e.remove()); $('bgFill').style.display = '';
+    if (!m.type) return;
+    let src = m.src;
+    if (m.up) { const d = await Sync.loadMedia(); src = d && d.d; }
+    if (!src) return;
+    const el = document.createElement(m.type === 'video' ? 'video' : 'img'); el.className = 'm'; el.src = src;
+    if (m.type === 'video') { el.autoplay = el.loop = el.muted = el.playsInline = true; el.play && el.play().catch(() => {}); }
+    bg.querySelectorAll('.m').forEach(e => e.remove()); bg.appendChild(el); $('bgFill').style.display = 'none';
+  }
+  function renderStart() {
+    const m = S.start.media || {}, key = (m.type || '') + '|' + (m.src || '') + '|' + (m.up || 0);
+    if (key !== lastMedia) { lastMedia = key; setMedia(m); }
+    tickStart();
+  }
+  function tickStart() {
+    const st = S.start, rem = st.running ? Math.max(0, (st.endAt - Date.now()) / 1000) : Math.max(0, st.left), done = rem <= 0;
+    $('startCard').classList.toggle('done', done);
+    const txt = done ? st.end : st.title;
+    if ($('sTitle').textContent !== txt) { $('sTitle').textContent = txt; fitTitle(); }
+    $('sTime').textContent = fmtT(rem);
+    $('sBar').firstElementChild.style.width = (st.duration > 0 ? Math.min(100, (1 - rem / st.duration) * 100) : 100) + '%';
   }
   setInterval(tick, 250);
   Sync.listen(d => { S = Sync.merge(Sync.defaults, d); render(); tick(); });
@@ -464,10 +622,7 @@ if (CONTROL) {
     $('swap').onclick = () => { [S.home, S.away] = [S.away, S.home]; document.querySelectorAll('[data-b^="home."],[data-b^="away."]').forEach(el => el.value = getP(S, el.dataset.b)); refresh(); publish(); };
     $('zero').onclick = () => { S.home.score = 0; S.away.score = 0; refresh(); publish(); };
 
-    [['h', 'home'], ['a', 'away']].forEach(([k, side]) => {
-      $(k + 'File').onchange = e => { const f = e.target.files[0]; if (f) shrink(f).then(u => { S[side].logo = u; refresh(); publish(); }); };
-      $(k + 'Clear').onclick = () => { S[side].logo = ''; refresh(); publish(); };
-    });
+    initGames(); initStart();
 
     $('tStart').onclick = () => { if (!S.timer.running) { S.timer.startedAt = Date.now(); S.timer.running = true; publish(); } };
     $('tPause').onclick = () => { if (S.timer.running) { S.timer.base = elapsed(); S.timer.running = false; publish(); } };
@@ -505,11 +660,69 @@ if (CONTROL) {
     setInterval(() => { const e = Math.max(0, Math.floor(elapsed())); $('timeNow').textContent = String(Math.floor(e / 60)).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0'); }, 250);
   }
 
+  const fillInputs = () => document.querySelectorAll('[data-b]').forEach(el => el.value = getP(S, el.dataset.b) ?? '');
+  const readURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+  const shrinkBg = f => readURL(f).then(u => new Promise((res, rej) => { const i = new Image(); i.onload = () => {
+    const sc = Math.min(1, 1280 / i.width), c = document.createElement('canvas'); c.width = Math.round(i.width * sc); c.height = Math.round(i.height * sc);
+    c.getContext('2d').drawImage(i, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', .8)); }; i.onerror = rej; i.src = u; }));
+
+  function initGames() {
+    const opts = '<option value="">Custom…</option>' + Object.keys(TEAMS).sort((x, y) => TEAMS[x][0].localeCompare(TEAMS[y][0])).map(k => `<option value="${k}">${TEAMS[k][0]}</option>`).join('');
+    [['h', 'home'], ['a', 'away']].forEach(([k, side]) => { const el = $(k + 'Sel'); el.innerHTML = opts;
+      el.onchange = () => { const t = TEAMS[el.value]; S[side].key = el.value; if (t) { S[side].name = t[0].toUpperCase(); S[side].short = t[1]; } fillInputs(); refresh(); publish(); }; });
+    const list = () => GAMES.filter(g => (!$('gClub').value || g.h === $('gClub').value || g.a === $('gClub').value) && (!$('gComp').value || g.c === $('gComp').value));
+    const open = g => g.ts >= Date.now() - 3 * 3600e3;
+    function fillGames() {
+      const l = list(); $('gSel').innerHTML = l.map(g => `<option value="${GAMES.indexOf(g)}">${fmt(g)}${g.t ? '' : ' (no time)'} · ${TEAMS[g.h][0]} v ${TEAMS[g.a][0]} · ${g.c === 'C' ? 'Champions League' : 'LaLiga'}</option>`).join('');
+      const i = l.findIndex(open); if (i >= 0) $('gSel').selectedIndex = i;
+    }
+    function load(g) {
+      if (!g) return; if ((S.home.score || S.away.score || S.timer.running || S.timer.base) && !confirm('Replace the current match? Score and clock will reset.')) return;
+      [['home', g.h], ['away', g.a]].forEach(([s, k]) => { S[s] = { ...S[s], key: k, name: TEAMS[k][0].toUpperCase(), short: TEAMS[k][1], score: 0 }; });
+      S.competition = g.c === 'C' ? 'CHAMPIONS LEAGUE · LEAGUE PHASE' : 'LALIGA' + (g.md ? ' · MATCHDAY ' + g.md : '');
+      S.timer = { running: false, base: 0, startedAt: 0, period: '1ST HALF', added: 0 };
+      const club = (g.h === 'BAR' || g.a === 'BAR') ? 'BAR' : 'RMA';
+      S.fixtures = GAMES.filter(x => x.ts > g.ts && (x.h === club || x.a === club)).slice(0, 3).map(x => ({ home: TEAMS[x.h][0], away: TEAMS[x.a][0], date: fmt(x) }));
+      fillInputs(); syncFields(); renderFx(); refresh(); publish();
+    }
+    $('gClub').onchange = $('gComp').onchange = fillGames;
+    $('gLoad').onclick = () => load(GAMES[+$('gSel').value]);
+    $('gNext').onclick = () => { const g = list().find(open); if (g) { $('gSel').value = GAMES.indexOf(g); load(g); } };
+    fillGames();
+  }
+
+  function initStart() {
+    const st = () => S.start, rem = () => st().running ? Math.max(0, (st().endAt - Date.now()) / 1000) : Math.max(0, st().left);
+    const adj = d => { if (st().running) st().endAt += d * 1000; else st().left = Math.max(0, st().left + d); publish(); };
+    $('stStart').onclick = () => { const s = st(); if (s.running) return; if (s.left <= 0) s.left = s.duration; s.endAt = Date.now() + s.left * 1000; s.running = true; publish(); };
+    $('stPause').onclick = () => { const s = st(); if (!s.running) return; s.left = rem(); s.running = false; publish(); };
+    $('stReset').onclick = () => { const s = st(); s.left = s.duration; s.running = false; publish(); };
+    $('stSet').onclick = () => { const s = st(); s.duration = Math.max(0, (+$('stM').value || 0) * 60 + (+$('stS').value || 0)); s.left = s.duration; s.running = false; publish(); };
+    $('stPlus').onclick = () => adj(60); $('stMinus').onclick = () => adj(-60);
+    $('stEnd').onclick = () => { st().left = 0; st().running = false; publish(); };
+    $('stM').value = Math.floor(st().duration / 60); $('stS').value = st().duration % 60;
+    setInterval(() => { $('stNow').textContent = fmtT(rem()); }, 250);
+    const msg = t => { $('bgMsg').textContent = t; };
+    $('bgFile').onchange = async e => {
+      const f = e.target.files[0]; if (!f) return; const vid = f.type.startsWith('video/');
+      try {
+        if (vid && f.size > 6e6) { msg('That video is ' + (f.size / 1e6).toFixed(1) + ' MB — uploads are limited to 6 MB. Paste a direct link instead.'); e.target.value = ''; return; }
+        msg('Uploading…'); const d = vid ? await readURL(f) : await shrinkBg(f);
+        await Sync.saveMedia({ d }); st().media = { type: vid ? 'video' : 'image', src: '', up: Date.now() }; publish(); msg('Background updated ✓');
+      } catch (err) { msg('Upload failed. Check your database rules, or paste a direct link instead.'); }
+      e.target.value = '';
+    };
+    $('bgUse').onclick = () => { const u = $('bgUrl').value.trim(); if (!u) return;
+      st().media = { type: /\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(u) ? 'video' : 'image', src: u, up: 0 }; publish(); msg('Background updated ✓'); };
+    $('bgClear').onclick = () => { st().media = { type: '', src: '', up: 0 }; publish(); msg('Background removed.'); };
+  }
+
   const blank = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
   function syncFields() { document.querySelectorAll('[data-b^="timer."]').forEach(el => el.value = getP(S, el.dataset.b)); }
   function refresh() {
     $('hS').textContent = S.home.score; $('aS').textContent = S.away.score;
-    $('hPrev').src = S.home.logo || blank; $('aPrev').src = S.away.logo || blank;
+    [['home', 'h'], ['away', 'a']].forEach(([side, k]) => { const key = tk(S[side]), e = $(k + 'Prev');
+      e.textContent = (S[side].short || '').slice(0, 3); e.style.cssText = crestCss(key); $(k + 'Sel').value = TEAMS[key] ? key : ''; });
   }
   function shrink(file) {
     return new Promise(res => {
