@@ -294,7 +294,7 @@
           <div class="row" style="margin-top:0"><input type="number" data-b="rx.camW" style="width:110px"><input type="number" data-b="rx.camH" style="width:110px"></div>
         </div>
         <div>
-          <label>Chat height (the chat copies the camera’s width and X)</label><input type="number" data-b="rx.chatH">
+          <small class="hint" style="margin-top:0">Chat and pop-up keep the same size as on the main overlay (440 × 600 and 440 × 64) and are centred under the camera.</small>
           <div class="toggles" style="margin-top:10px"><label><input type="checkbox" data-c="rx.frame"> Glass frame around camera</label><label><input type="checkbox" data-c="rx.chat"> Chat box</label><label><input type="checkbox" data-c="rx.cta"> Subscribe pop-up</label></div>
         </div>
       </div>
@@ -587,9 +587,9 @@ if (!CONTROL) {
   }
   /* ---- reaction page: chat under the camera, same width ---- */
   function renderReact() {
-    const r = S.rx, x = +r.camX, y = +r.camY, w = +r.camW, h = +r.camH, g = 20, ch = +r.chatH, cy = y + h + g;
+    const r = S.rx, x = +r.camX, y = +r.camY, w = +r.camW, h = +r.camH, g = 20, cw = 440, ch = 600, cx = x + (w - cw) / 2, cy = y + h + g;
     const put = (el, a, b, c, d) => { el.style.left = a + 'px'; el.style.top = b + 'px'; el.style.width = c + 'px'; el.style.height = d + 'px'; };
-    put($('camFrame'), x, y, w, h); put($('chat'), x, cy, w, ch); put($('cta'), x, cy + ch + g, w, 64);
+    put($('camFrame'), x, y, w, h); put($('chat'), cx, cy, cw, ch); put($('cta'), cx, cy + ch + 16, cw, 64);
     $('camFrame').classList.toggle('hide', !r.frame);
   }
   /* ---- starting-soon page ---- */
@@ -695,8 +695,8 @@ if (CONTROL) {
   }
 
   function rxInfo() {
-    const r = S.rx, cy = r.camY + r.camH + 20;
-    $('rxInfo').textContent = `Reaction page = Browser Source 1920 × 1080 at x 0, y 0, placed above your camera. Streamlabs chat widget on top of it: size ${r.camW - 16} × ${r.chatH - 16}, position x ${r.camX + 8}, y ${cy + 8}.` + (cy + r.chatH + 20 + 64 > 1080 ? ' ⚠ The subscribe pop-up would fall off the bottom — lower the chat height.' : '');
+    const r = S.rx, cy = r.camY + r.camH + 20, cx = Math.round(r.camX + (r.camW - 440) / 2);
+    $('rxInfo').textContent = `Reaction page = Browser Source 1920 × 1080 at x 0, y 0, placed above your camera. Streamlabs chat widget on top of it: size 424 × 584, position x ${cx + 8}, y ${cy + 8}.` + (cy + 600 + 16 + 64 > 1080 ? ' ⚠ The subscribe pop-up would fall off the bottom of the screen — move the camera up or make it shorter.' : '');
   }
   const fillInputs = () => document.querySelectorAll('[data-b]').forEach(el => el.value = getP(S, el.dataset.b) ?? '');
   const readURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
