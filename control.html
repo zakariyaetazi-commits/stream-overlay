@@ -39,11 +39,11 @@
   .hide{opacity:0;transform:translateY(-14px);pointer-events:none}
 
   /* scoreboard */
-  #score{position:absolute;left:50%;top:28px;width:1060px;height:124px;margin-left:-530px;
+  #score{position:absolute;left:50%;top:28px;width:1200px;height:124px;margin-left:-600px;
     display:grid;grid-template-columns:1fr 210px 1fr;align-items:center;padding:0 34px}
   .side{display:flex;align-items:center;gap:18px;min-width:0}
   .side.away{flex-direction:row-reverse}
-  .nm{font-weight:700;font-size:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+  .nm{font-weight:700;font-size:28px;white-space:nowrap;overflow:hidden;flex:1;min-width:0}
   .side.away .nm{text-align:right}
   .crest{width:80px;height:80px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;font-size:24px;
     background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);overflow:hidden}
@@ -77,6 +77,12 @@
   tr.me td{background:linear-gradient(90deg,rgba(0,77,152,.85),rgba(165,0,68,.75))}
   tr.me td:first-child{border-radius:8px 0 0 8px}tr.me td:last-child{border-radius:0 8px 8px 0}
   tr.me td:nth-child(2){color:var(--gold);font-weight:800}
+
+  .sub{font-size:13px;font-weight:700;color:#bcd1fa;margin:4px 0 0;letter-spacing:.5px}
+  .res{font-weight:800;background:rgba(255,255,255,.16);border-radius:8px;padding:1px 9px;margin:0 6px;white-space:nowrap}
+  #cta{position:absolute;left:30px;top:806px;width:440px;height:64px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;
+    opacity:0;transform:translateY(16px) scale(.96);pointer-events:none;border-radius:32px}
+  #cta.on{opacity:1;transform:none}
 
   /* ================= CONTROL ================= */
   body.control{font-size:17px}
@@ -125,9 +131,10 @@
   </div>
 
   <div id="chat" class="glass alt"><iframe id="chatFrame" allowtransparency="true"></iframe></div>
+  <div id="cta" class="glass"><span id="ctaText"></span></div>
 
   <div id="right">
-    <div id="fixtures" class="glass"><div class="ttl">Upcoming games</div><div id="fxList"></div></div>
+    <div id="fixtures" class="glass"><div class="ttl">Games</div><div id="fxList"></div></div>
     <div id="table" class="glass alt"><div class="ttl" id="tTitle">League table</div>
       <table><thead><tr><th></th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead><tbody id="tBody"></tbody></table>
     </div>
@@ -195,10 +202,17 @@
         <label><input type="checkbox" data-c="show.fixtures"> Upcoming games</label>
         <label><input type="checkbox" data-c="show.chat"> Chat box</label>
       </div>
-      <h2 style="margin-top:20px">YouTube chat</h2>
-      <label>Paste your live link or video ID</label>
+      <h2 style="margin-top:20px">Chat</h2>
+      <label>Streamlabs chat box widget link (keep it private)</label>
+      <input type="text" data-b="chatUrl" placeholder="https://streamlabs.com/widgets/chat-box/v1/…">
+      <label>Fallback: YouTube live link or video ID (used when the field above is empty)</label>
       <input type="text" id="videoIn" placeholder="https://www.youtube.com/watch?v=… or yi3OMVSgsAc">
-      <small class="hint">Current video ID: <b id="videoNow"></b>. The Studio pop-out link can’t be embedded, so the overlay uses the public chat embed for the same video.</small>
+      <small class="hint">Current YouTube video ID: <b id="videoNow"></b></small>
+      <details style="margin-top:10px"><summary style="cursor:pointer;color:#a8b8e6">Custom CSS for the Streamlabs chat box (same font and look)</summary>
+        <textarea id="cssBox" readonly style="width:100%;height:190px;margin-top:8px;background:#0c1126;color:#cfe0ff;border:1px solid #27325c;border-radius:10px;padding:10px;font:13px monospace"></textarea>
+        <div class="row"><button class="ghost" id="cssCopy">Copy CSS</button></div>
+        <small class="hint">Paste it in Streamlabs → Chat Box widget settings → Custom CSS, then save.</small>
+      </details>
     </div>
 
     <div class="card">
@@ -207,8 +221,32 @@
       <div class="row"><button class="ghost" id="fxAdd">+ Add game</button></div>
     </div>
 
+    <div class="card">
+      <h2>Last game</h2>
+      <div class="two">
+        <div><label>Home</label><input type="text" data-b="previous.home"></div>
+        <div><label>Away</label><input type="text" data-b="previous.away"></div>
+        <div><label>Home goals</label><input type="number" min="0" data-b="previous.hs"></div>
+        <div><label>Away goals</label><input type="number" min="0" data-b="previous.as"></div>
+      </div>
+      <label>Date</label><input type="text" data-b="previous.date" placeholder="31 Oct">
+      <div class="row"><button class="gold" id="finish">Finish match → save to table and last game</button></div>
+      <small class="hint">Leave “Home” empty to hide the last game. “Finish match” adds the current result to the table, copies it to “Last game” and resets the score and clock.</small>
+    </div>
+
+    <div class="card">
+      <h2>Subscribe pop-up (under the chat)</h2>
+      <label>First message</label><input type="text" data-b="cta.first">
+      <label>Second message (shown right after)</label><input type="text" data-b="cta.second">
+      <label>Repeat every (seconds, 180 = 3 minutes)</label><input type="number" min="20" data-b="cta.cycle">
+      <div class="toggles" style="margin-top:8px"><label><input type="checkbox" data-c="show.cta"> Show the pop-up</label></div>
+      <small class="hint">Each message slides in for 8 seconds, one after the other, then both hide until the next round.</small>
+    </div>
+
     <div class="card wide">
       <h2>League table</h2>
+      <div class="toggles"><label><input type="checkbox" data-c="liveTable"> Update the table live from the score (Home and Away teams)</label></div>
+      <small class="hint">The rows below are the table before the match. The overlay adds the live score to them and re-ranks automatically.</small>
       <div class="scroll"><table class="tbl"><thead><tr><th></th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th><th></th></tr></thead><tbody id="tBody2"></tbody></table></div>
       <div class="row"><button class="ghost" id="tAdd">+ Add row</button><button class="gold" id="tSort">Sort by points, then GD</button><button class="ghost" id="tReset2">Reset to 8 Nov table</button></div>
       <small class="hint">Any club with “Barc” in its name is highlighted on the overlay.</small>
@@ -252,11 +290,14 @@ const Sync = (() => {
     competition: 'LALIGA · MATCHDAY 12',
     table: seedTable(),
     fixtures: [
-      { home: 'Atlético Madrid', away: 'FC Barcelona', date: 'Today 20:00' },
       { home: 'FC Barcelona', away: 'Villarreal', date: 'Sun 22 Nov 13:00' }
     ],
     videoId: 'yi3OMVSgsAc',
-    show: { score: true, table: true, fixtures: true, chat: true }
+    chatUrl: '',
+    previous: { home: 'FC Barcelona', away: 'Alavés', hs: 6, as: 1, date: '31 Oct' },
+    liveTable: true,
+    cta: { first: 'Subscribe to the channel', second: 'Like the stream', cycle: 180 },
+    show: { score: true, table: true, fixtures: true, chat: true, cta: true }
   };
 
   const clone = o => JSON.parse(JSON.stringify(o));
@@ -300,11 +341,66 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const CONTROL = new URLSearchParams(location.search).has('control') || /control\.html$/i.test(location.pathname);
 document.body.className = CONTROL ? 'control' : 'overlay';
 
+const Live = (() => {
+  const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(fc|cf|cd|ud|rcd|ca)\b/g, '').replace(/\s+/g, ' ').trim();
+  const find = (t, name) => {
+    const n = norm(name); if (!n) return -1;
+    let i = t.findIndex(r => norm(r.team) === n); if (i >= 0) return i;
+    return t.findIndex(r => { const x = norm(r.team); return x && (n.includes(x) || x.includes(n)); });
+  };
+  const started = S => S.timer.base > 0 || S.timer.running || (+S.home.score || 0) > 0 || (+S.away.score || 0) > 0;
+  const num = v => parseInt(String(v).replace('+', ''), 10) || 0;
+  function add(r, gf, ga) {
+    r.p = String(num(r.p) + 1);
+    const d = gf - ga;
+    if (d > 0) { r.w = String(num(r.w) + 1); r.pts = String(num(r.pts) + 3); }
+    else if (d === 0) { r.d = String(num(r.d) + 1); r.pts = String(num(r.pts) + 1); }
+    else r.l = String(num(r.l) + 1);
+    const g = num(r.gd) + d; r.gd = (g > 0 ? '+' : '') + g;
+  }
+  function apply(S, force) {
+    if (!force && !(S.liveTable && started(S))) return S.table;
+    const t = S.table.map(r => ({ ...r }));
+    const h = find(t, S.home.name), a = find(t, S.away.name);
+    if (h < 0 || a < 0 || h === a) return S.table;
+    const hs = +S.home.score || 0, as = +S.away.score || 0;
+    add(t[h], hs, as); add(t[a], as, hs);
+    return t.map((r, i) => ({ r, i })).sort((x, y) => num(y.r.pts) - num(x.r.pts) || num(y.r.gd) - num(x.r.gd) || x.i - y.i).map(o => o.r);
+  }
+  return { apply, started };
+})();
+
+const CHAT_CSS = `@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&display=swap');
+html, body { background: transparent !important; overflow: hidden; }
+* { font-family: 'Outfit', sans-serif !important; text-shadow: none !important; }
+#log { padding: 10px 14px; }
+#log > div, .message-row, .sl__chat__layout { margin-bottom: 8px; }
+.name, .meta .name { font-weight: 800 !important; font-size: 22px !important; color: #EDBB00 !important; }
+.message, .message span { font-weight: 600 !important; font-size: 22px !important; color: #ffffff !important; line-height: 1.25; }
+.badge, .badges img { height: 20px !important; vertical-align: middle; }`;
+
 /* ===================== OVERLAY ===================== */
 if (!CONTROL) {
   let S = Sync.merge(Sync.defaults, null), lastVideo = null;
   const fit = () => { $('stage').style.transform = `scale(${Math.min(innerWidth / 1920, innerHeight / 1080)})`; };
   addEventListener('resize', fit); fit();
+
+  function fitName(el) {
+    el.style.whiteSpace = 'nowrap'; el.style.lineHeight = ''; let sz = 28; el.style.fontSize = sz + 'px';
+    while (el.scrollWidth > el.clientWidth + 1 && sz > 15) { sz--; el.style.fontSize = sz + 'px'; }
+    if (el.scrollWidth > el.clientWidth + 1) { el.style.whiteSpace = 'normal'; el.style.fontSize = '19px'; el.style.lineHeight = '1.05'; }
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitName($('hName')); fitName($('aName')); });
+  function showCta(text, done) {
+    $('ctaText').textContent = text; $('cta').classList.add('on');
+    setTimeout(() => { $('cta').classList.remove('on'); setTimeout(done, 900); }, 8000);
+  }
+  function ctaLoop() {
+    const next = () => setTimeout(ctaLoop, Math.max(20, Number(S.cta.cycle) || 180) * 1000);
+    if (!S.show.cta) return next();
+    showCta(S.cta.first, () => showCta(S.cta.second, next));
+  }
+  setTimeout(ctaLoop, 6000);
 
   const crest = (el, t) => { el.innerHTML = t.logo ? `<img src="${esc(t.logo)}" alt="">` : esc((t.short || '').slice(0, 3)); };
   const setScore = (id, v) => {
@@ -319,22 +415,28 @@ if (!CONTROL) {
     $('comp').textContent = S.competition; $('period').textContent = S.timer.period;
     const ad = Number(S.timer.added) || 0; $('added').textContent = ad > 0 ? '+' + ad : '';
     $('tTitle').textContent = 'League table';
-    $('tBody').innerHTML = S.table.map((r, i) =>
+    $('tBody').innerHTML = Live.apply(S).map((r, i) =>
       `<tr class="${/barc|barç/i.test(r.team) ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.team)}</td><td>${esc(r.p)}</td><td>${esc(r.w)}</td><td>${esc(r.d)}</td><td>${esc(r.l)}</td><td>${esc(r.gd)}</td><td>${esc(r.pts)}</td></tr>`).join('');
-    $('fxList').innerHTML = S.fixtures.map(f =>
-      `<div class="fx"><span>${esc(f.home)} <b style="color:var(--gold)">v</b> ${esc(f.away)}</span><small>${esc(f.date)}</small></div>`).join('');
+    const pv = S.previous;
+    const prevHtml = pv && pv.home ? `<div class="sub">Last game</div><div class="fx"><span>${esc(pv.home)}<b class="res">${esc(pv.hs)} – ${esc(pv.as)}</b>${esc(pv.away)}</span><small>${esc(pv.date)}</small></div>` : '';
+    const nextHtml = S.fixtures.length ? `<div class="sub">${S.fixtures.length > 1 ? 'Next games' : 'Next game'}</div>` + S.fixtures.map(f =>
+      `<div class="fx"><span>${esc(f.home)} <b style="color:var(--gold)">v</b> ${esc(f.away)}</span><small>${esc(f.date)}</small></div>`).join('') : '';
+    $('fxList').innerHTML = prevHtml + nextHtml;
+    fitName($('hName')); fitName($('aName'));
 
-    if (S.videoId !== lastVideo) {
-      lastVideo = S.videoId;
+    const chatKey = S.chatUrl || S.videoId;
+    if (chatKey !== lastVideo) {
+      lastVideo = chatKey;
       const f = $('chatFrame');
-      if (S.videoId && location.hostname) f.src = `https://www.youtube.com/live_chat?v=${encodeURIComponent(S.videoId)}&embed_domain=${location.hostname}&dark_theme=1`;
+      if (S.chatUrl) f.src = S.chatUrl;
+      else if (S.videoId && location.hostname) f.src = `https://www.youtube.com/live_chat?v=${encodeURIComponent(S.videoId)}&embed_domain=${location.hostname}&dark_theme=1`;
       else f.removeAttribute('src');
     }
     const sh = S.show;
     $('score').classList.toggle('hide', !sh.score);
     $('table').classList.toggle('hide', !sh.table);
     $('fixtures').classList.toggle('hide', !sh.fixtures);
-    $('chat').classList.toggle('hide', !(sh.chat && S.videoId));
+    $('chat').classList.toggle('hide', !(sh.chat && (S.chatUrl || S.videoId)));
   }
   function tick() {
     const t = S.timer, e = Math.max(0, Math.floor(t.base + (t.running ? (Date.now() - t.startedAt) / 1000 : 0)));
@@ -396,6 +498,18 @@ if (CONTROL) {
       if (m) { S.videoId = m[1]; refresh(); publish(); }
     };
 
+    $('cssBox').value = CHAT_CSS;
+    $('cssCopy').onclick = () => { $('cssBox').select(); document.execCommand('copy'); $('cssCopy').textContent = 'Copied ✓'; setTimeout(() => $('cssCopy').textContent = 'Copy CSS', 1500); };
+    $('finish').onclick = () => {
+      if (!confirm('Finish the match? The result is added to the table and Last game, then score and clock reset.')) return;
+      if (S.liveTable && Live.started(S)) S.table = Live.apply(S, true);
+      S.previous = { home: S.home.name, away: S.away.name, hs: Number(S.home.score) || 0, as: Number(S.away.score) || 0,
+        date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) };
+      S.home.score = 0; S.away.score = 0;
+      S.timer = { running: false, base: 0, startedAt: 0, period: '1ST HALF', added: 0 };
+      document.querySelectorAll('[data-b^="previous."],[data-b^="timer."]').forEach(el => el.value = getP(S, el.dataset.b));
+      renderTable(); refresh(); publish();
+    };
     $('fxAdd').onclick = () => { S.fixtures.push({ home: '', away: '', date: '' }); renderFx(); publish(); };
     $('tAdd').onclick = () => { S.table.push({ team: '', p: '0', w: '0', d: '0', l: '0', gd: '0', pts: '0' }); renderTable(); publish(); };
     $('tReset2').onclick = () => { if (confirm('Replace the table with the 8 Nov version?')) { S.table = Sync.seedTable(); renderTable(); publish(); } };
