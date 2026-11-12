@@ -91,6 +91,52 @@
   .tint.r{right:0;border-radius:0 26px 26px 0;background:radial-gradient(120% 140% at 100% 50%,var(--ac,transparent),transparent 70%)}
   tr.me td{background:linear-gradient(90deg,var(--r1,rgba(0,77,152,.85)),var(--r2,rgba(165,0,68,.75)))}
 
+  /* ================= RATING PAGE ================= */
+  body.rating{overflow:hidden;background:transparent}
+  body.rating #app,body.rating #score,body.rating #right,body.rating #bg,body.rating #startCard,body.rating #chat,body.rating #cta{display:none}
+  #rt{position:absolute;display:none;align-items:center;gap:34px;padding:25px 40px;box-sizing:border-box}
+  .rtPic{width:250px;height:250px;border-radius:24px;overflow:hidden;flex:none;display:grid;place-items:center;font-size:90px;font-weight:800;background:linear-gradient(135deg,var(--blue2),var(--garnet));border:2px solid rgba(255,255,255,.3)}
+  .rtPic img{width:100%;height:100%;object-fit:cover}
+  .rtMid{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+  .rtLbl{color:var(--gold);font-weight:800;letter-spacing:6px;font-size:22px}
+  .rtName{font-weight:800;font-size:48px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:6px 0}
+  .rtTime{font-weight:800;font-size:76px;line-height:1}
+  .rtWin{font-weight:800;font-size:110px;line-height:1;text-shadow:0 0 30px rgba(237,187,0,.6)}
+  .rtSub{font-weight:700;letter-spacing:4px;font-size:20px;opacity:.8}
+  .rtSide{width:430px;flex:none;display:flex;flex-direction:column;gap:14px}
+  .rtRow{display:flex;align-items:center;gap:16px}
+  .rtVal{font-size:50px;font-weight:800;min-width:96px;text-align:center}
+  .rtVal.w{font-size:34px;min-width:170px;max-width:170px;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rtBar{flex:1;height:20px;border-radius:12px;background:rgba(255,255,255,.14);overflow:hidden}
+  .rtBar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue2),var(--garnet),var(--gold));transition:width .5s}
+  .rtCnt{font-weight:800;font-size:28px;min-width:64px;text-align:right}
+  .rtWait{font-weight:700;letter-spacing:3px;opacity:.7;text-align:center}
+  .sTop{display:flex;align-items:center;gap:14px}
+  .sPic{width:84px;height:84px;border-radius:18px;overflow:hidden;flex:none;display:grid;place-items:center;font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--blue2),var(--garnet));border:2px solid rgba(255,255,255,.3)}
+  .sPic img{width:100%;height:100%;object-fit:cover}
+  .sInfo{flex:1;min-width:0}
+  .sInfo .rtLbl{font-size:13px;letter-spacing:4px}
+  .sInfo .rtName{font-size:28px;margin:2px 0}
+  .sInfo .rtTime{font-size:34px}
+  .sWin{font-weight:800;font-size:58px;line-height:1;flex:none;text-shadow:0 0 24px rgba(237,187,0,.6)}
+  .sBars{display:flex;flex-direction:column;gap:8px}
+  .sBars .rtRow{gap:12px}
+  .sBars .rtVal{font-size:26px;min-width:56px}
+  .sBars .rtVal.w{font-size:20px;min-width:110px;max-width:110px}
+  .sBars .rtBar{height:12px}
+  .sBars .rtCnt{font-size:18px;min-width:44px}
+  .sBars .rtWait{font-size:13px}
+  .rtResWrap{width:100%;height:100%;display:flex;flex-direction:column}
+  .rtResTitle{font-weight:800;letter-spacing:10px;font-size:44px;color:var(--gold);text-align:center;margin-bottom:14px}
+  .rtGrid{flex:1;display:grid;grid-auto-flow:column;grid-template-columns:1fr 1fr;column-gap:30px}
+  .rtItem{display:flex;align-items:center;gap:16px;padding:0 16px;border-radius:16px;background:rgba(255,255,255,.08);margin-bottom:8px;overflow:hidden}
+  .rtItem .rk{font-size:30px;font-weight:800;min-width:44px;color:var(--gold)}
+  .rtMini{width:58px;height:58px;border-radius:14px;overflow:hidden;flex:none;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,var(--blue2),var(--garnet))}
+  .rtMini img{width:100%;height:100%;object-fit:cover}
+  .rtItem .nm{flex:1;min-width:0;font-size:30px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rtItem .sc{font-size:42px;font-weight:800}
+  .rtItem .sc small{display:block;font-size:15px;font-weight:600;opacity:.75;text-align:right;letter-spacing:2px}
+
   /* ================= REACTION PAGE ================= */
   body.reaction{overflow:hidden;background:transparent}
   body.reaction #app,body.reaction #score,body.reaction #right,body.reaction #bg,body.reaction #startCard{display:none}
@@ -164,6 +210,7 @@
 
   <div id="chat" class="glass alt"></div>
   <div id="cta" class="glass"><span id="ctaText"></span></div>
+  <div id="rt" class="glass"></div>
   <div id="camFrame" class="glass frame alt" style="position:absolute"></div>
 
   <div id="right">
@@ -179,7 +226,7 @@
   <div class="top">
     <div><h1>Overlay control</h1><span style="color:#a8b8e6">Every change goes live on the stream instantly.</span></div>
     <span id="status">starting…</span>
-    <a href="index.html" target="_blank">Open overlay ↗</a><a href="starting.html" target="_blank">Open starting page ↗</a><a href="reaction.html" target="_blank">Open reaction page ↗</a>
+    <a href="index.html" target="_blank">Open overlay ↗</a><a href="starting.html" target="_blank">Open starting page ↗</a><a href="reaction.html" target="_blank">Open reaction page ↗</a><a href="rating.html" target="_blank">Open rating page ↗</a>
   </div>
 
   <div class="grid" id="ctl" style="display:none">
@@ -285,6 +332,37 @@
     </div>
 
     <div class="card wide">
+      <h2>Chat ratings &amp; word poll <a href="rating.html" target="_blank" style="font-size:13px;font-weight:600;margin-left:8px">Open page ↗</a></h2>
+      <details><summary style="cursor:pointer;font-weight:700">One-time setup: get a free YouTube API key (≈5 min)</summary>
+        <small class="hint">1) Go to console.cloud.google.com and create a new project. 2) APIs &amp; Services → Library → search “YouTube Data API v3” → Enable. 3) APIs &amp; Services → Credentials → Create credentials → API key. 4) Copy the key and paste it below (it is stored only in this browser, never in your files or database). Free daily limit: 10,000 units; reading chat costs about 50 units per minute, and only while a round is open.</small>
+      </details>
+      <label>YouTube API key</label><input type="password" id="ytKey" placeholder="AIza…">
+      <label>Live stream link</label>
+      <div class="row" style="margin-top:0"><input type="text" id="ytVid" placeholder="https://www.youtube.com/watch?v=…" style="flex:1;min-width:240px"><button id="ytGo">Connect</button></div>
+      <small class="hint" id="rtMsg">Not connected. You can still test with the test-vote box below.</small>
+
+      <label style="margin-top:14px">Players (name + optional picture)</label>
+      <div class="row" style="margin-top:0"><input type="text" id="plName" placeholder="Player name" style="flex:1;min-width:180px"><input type="file" id="plImg" accept="image/*"><button id="plAdd">Add</button></div>
+      <div class="row"><textarea id="plBulk" rows="2" placeholder="Or paste many names, one per line…" style="flex:1;min-width:240px"></textarea><button class="ghost" id="plBulkBtn">Add names</button></div>
+      <div id="plList"></div><input type="file" id="plPic" accept="image/*" style="display:none">
+      <small class="hint">Click a player’s picture box to add or change the picture.</small>
+
+      <div class="two" style="margin-top:12px">
+        <div><label>Round length (seconds)</label><input type="number" data-b="rt.dur" min="10">
+          <div class="row"><button class="gold" id="rtNext">Start next player</button><button class="ghost" id="rtStop">Stop now</button></div></div>
+        <div><label>Poll title</label><input type="text" data-b="rt.pollTitle" placeholder="Who is man of the match?">
+          <label>Poll length (seconds, 0 = until I stop it)</label><input type="number" data-b="rt.pollDur" min="0">
+          <div class="row"><button class="gold" id="pollStart">Start word poll</button></div></div>
+      </div>
+      <div id="rtNow" style="font-weight:800;font-size:22px;margin-top:10px"></div>
+      <small class="hint" id="rtLive">No round running.</small>
+      <div class="row"><input type="text" id="rtTest" placeholder="Test vote: type a message like “9” or “messi”" style="flex:1;min-width:240px"><button class="ghost" id="rtTestBtn">Add test vote</button></div>
+      <div class="row"><button class="gold" id="rtRes">Show final ratings</button><button class="ghost" id="rtOff">Hide overlay</button><button class="ghost" id="rtReset">Clear all ratings</button>
+        <select data-b="rt.pos"><option value="bottom">Card at bottom</option><option value="center">Card in middle</option><option value="top">Card at top</option></select></div>
+      <small class="hint">Keep this control page open while a round runs: it reads the chat and ends the round. Add rating.html as a Browser Source (1920 × 1080 at 0, 0).</small>
+    </div>
+
+    <div class="card wide">
       <h2>Reaction scene (chat under the camera) <a href="reaction.html" target="_blank" style="font-size:13px;font-weight:600;margin-left:8px">Open page ↗</a></h2>
       <div class="two">
         <div>
@@ -294,7 +372,7 @@
           <div class="row" style="margin-top:0"><input type="number" data-b="rx.camW" style="width:110px"><input type="number" data-b="rx.camH" style="width:110px"></div>
         </div>
         <div>
-          <label>Chat height (the chat copies the camera’s width and X)</label><input type="number" data-b="rx.chatH">
+          <small class="hint" style="margin-top:0">Chat and pop-up keep the same size as on the main overlay (440 × 600 and 440 × 64) and are centred under the camera.</small>
           <div class="toggles" style="margin-top:10px"><label><input type="checkbox" data-c="rx.frame"> Glass frame around camera</label><label><input type="checkbox" data-c="rx.chat"> Chat box</label><label><input type="checkbox" data-c="rx.cta"> Subscribe pop-up</label></div>
         </div>
       </div>
@@ -379,7 +457,8 @@ const Sync = (() => {
     cta: { first: 'Subscribe to the channel', second: 'Like the stream', cycle: 180 },
     show: { score: true, table: true, fixtures: true, chat: true, cta: true },
     start: { title: 'STARTING SOON', end: 'CHAAAAAAAT', duration: 300, left: 300, running: false, endAt: 0, chat: true, cta: true, media: { type: '', src: '', up: 0 } },
-    rx: { camX: 1252, camY: 22, camW: 610, camH: 340, chatH: 500, frame: true, chat: true, cta: true }
+    rx: { camX: 1252, camY: 22, camW: 610, camH: 340, chatH: 500, frame: true, chat: true, cta: true },
+    rt: { mode: 'off', phase: 'idle', cur: -1, dur: 150, pollDur: 0, pollTitle: '', pos: 'bottom', endAt: 0, total: 0, people: 0, top: [], players: [], pRev: 0 }
   };
 
   const clone = o => JSON.parse(JSON.stringify(o));
@@ -424,7 +503,16 @@ const Sync = (() => {
     if (murl) { try { return await (await fetch(murl)).json(); } catch (e) { return null; } }
     try { return JSON.parse(localStorage.getItem('stream-media')); } catch (e) { return null; }
   }
-  return { defaults, merge, save, load, listen, seedTable, saveMedia, loadMedia, online: !!url, setStatus };
+  const purl = db ? db + '/players.json' : null;
+  async function savePlayers(d) {
+    if (purl) { const r = await fetch(purl, { method: 'PUT', body: JSON.stringify(d) }); if (!r.ok) throw new Error('db'); }
+    else localStorage.setItem('stream-players', JSON.stringify(d));
+  }
+  async function loadPlayers() {
+    if (purl) { try { return await (await fetch(purl)).json(); } catch (e) { return null; } }
+    try { return JSON.parse(localStorage.getItem('stream-players')); } catch (e) { return null; }
+  }
+  return { defaults, merge, save, load, listen, seedTable, saveMedia, loadMedia, savePlayers, loadPlayers, online: !!url, setStatus };
 })();
 
 const $ = id => document.getElementById(id);
@@ -433,7 +521,8 @@ const QS = new URLSearchParams(location.search);
 const CONTROL = QS.has('control') || /control\.html$/i.test(location.pathname);
 const START = !CONTROL && (QS.has('starting') || /starting\.html$/i.test(location.pathname));
 const REACT = !CONTROL && !START && (QS.has('reaction') || /reaction\.html$/i.test(location.pathname));
-document.body.className = CONTROL ? 'control' : START ? 'starting' : REACT ? 'reaction' : 'overlay';
+const RATE = !CONTROL && !START && !REACT && (QS.has('rating') || /rating\.html$/i.test(location.pathname));
+document.body.className = CONTROL ? 'control' : START ? 'starting' : REACT ? 'reaction' : RATE ? 'rating' : 'overlay';
 const fmtT = s => { s = Math.max(0, Math.ceil(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60, p = n => String(n).padStart(2, '0'); return (h ? h + ':' : '') + p(m) + ':' + p(x); };
 
 const Live = (() => {
@@ -579,17 +668,49 @@ if (!CONTROL) {
     $('chat').classList.toggle('hide', !sh.chat);
     if (START) renderStart();
     if (REACT) renderReact();
+    if (RATE) renderRate();
   }
   function tick() {
+    if (RATE) tickRate();
     if (START) tickStart();
     const t = S.timer, e = Math.max(0, Math.floor(t.base + (t.running ? (Date.now() - t.startedAt) / 1000 : 0)));
     $('clock').textContent = String(Math.floor(e / 60)).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0');
   }
+  /* ---- rating / poll page ---- */
+  let rtKey = '', PIMG = {}, pRevLoaded = -1;
+  function tickRate() { const r = S.rt, t = $('rtTime'); if (t && r.endAt) t.textContent = fmtT(Math.max(0, (r.endAt - Date.now()) / 1000)); }
+  function renderRate() {
+    const r = S.rt, el = $('rt');
+    if (r.pRev !== pRevLoaded) { pRevLoaded = r.pRev; Sync.loadPlayers().then(d => { PIMG = d || {}; rtKey = ''; renderRate(); }); }
+    const key = JSON.stringify(r); if (key === rtKey) return; rtKey = key;
+    if (r.mode !== 'rating' && r.mode !== 'poll' && r.mode !== 'results') { el.style.cssText = 'display:none'; return; }
+    const done = r.phase === 'done', top = (r.top || []).slice(0, 3), max = Math.max(1, ...top.map(t => t[1]));
+    const img = (p, c) => PIMG[p.id] ? `<img src="${PIMG[p.id]}" alt="">` : esc((p.n || '?').slice(0, 2).toUpperCase());
+    if (r.mode === 'results') {
+      const list = r.players.filter(p => p.win != null).sort((a, b) => b.win - a.win || (b.avg || 0) - (a.avg || 0));
+      const rows = Math.max(1, Math.ceil(list.length / 2)), rh = Math.min(96, Math.floor(740 / rows));
+      const H = Math.min(900, 150 + rows * rh + 24);
+      el.style.cssText = `display:flex;left:260px;top:${Math.round((1080 - H) / 2)}px;width:1400px;height:${H}px`;
+      el.innerHTML = `<div class="rtResWrap"><div class="rtResTitle">FINAL RATINGS</div>` + (list.length
+        ? `<div class="rtGrid" style="grid-template-rows:repeat(${rows},${rh}px)">` + list.map((p, i) => `<div class="rtItem" style="height:${rh - 8}px"><b class="rk">${i + 1}</b><div class="rtMini">${img(p)}</div><span class="nm">${esc(p.n)}</span><span class="sc">${p.win}<small>AVG ${p.avg}</small></span></div>`).join('') + '</div>'
+        : '<div class="rtWait" style="margin:auto">No ratings yet</div>') + '</div>';
+      return;
+    }
+    const pos = r.pos === 'top' ? 'top:40px' : r.pos === 'center' ? 'top:430px' : 'bottom:40px';
+    el.style.cssText = `display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:18px 20px;left:735px;width:450px;${pos}`;
+    const poll = r.mode === 'poll', p = r.players[r.cur] || {};
+    const bars = top.length ? top.map(t => `<div class="rtRow"><b class="rtVal${poll ? ' w' : ''}">${esc(poll ? t[0].toUpperCase() : t[0])}</b><div class="rtBar"><i style="width:${t[1] / max * 100}%"></i></div><span class="rtCnt">${t[1]}</span></div>`).join('') : '<div class="rtWait">WAITING FOR VOTES…</div>';
+    const clock = r.endAt ? '<div class="rtTime" id="rtTime">00:00</div>' : '<div class="rtSub" style="font-size:13px">VOTING IS OPEN</div>';
+    const win = poll ? (top[0] ? esc(top[0][0].toUpperCase()) : '–') : (p.win != null ? p.win : '–');
+    const sub = poll ? `${r.total} MESSAGES` : `AVG ${p.avg != null ? p.avg : '–'} · ${p.votes || 0} VOTES`;
+    el.innerHTML = `<div class="sTop">${poll ? '' : `<div class="sPic">${img(p)}</div>`}<div class="sInfo"><div class="rtLbl">${poll ? 'CHAT POLL' : done ? 'FINAL RATING' : 'RATE THE PLAYER'}</div><div class="rtName">${esc(poll ? (r.pollTitle || 'What do you think?') : (p.n || ''))}</div>${done ? `<div class="rtSub" style="font-size:12px;letter-spacing:2px">${sub}</div>` : clock}</div>${done ? `<div class="sWin"${poll ? ' style="font-size:28px;max-width:150px;overflow:hidden;text-overflow:ellipsis"' : ''}>${win}</div>` : ''}</div><div class="sBars">${bars}</div>`;
+    tickRate();
+  }
   /* ---- reaction page: chat under the camera, same width ---- */
   function renderReact() {
-    const r = S.rx, x = +r.camX, y = +r.camY, w = +r.camW, h = +r.camH, g = 20, ch = +r.chatH, cy = y + h + g;
+    const r = S.rx, x = +r.camX, y = +r.camY, w = +r.camW, h = +r.camH, g = 20, cw = 440, ch = 600, cx = x + (w - cw) / 2, cy = y + h + g;
     const put = (el, a, b, c, d) => { el.style.left = a + 'px'; el.style.top = b + 'px'; el.style.width = c + 'px'; el.style.height = d + 'px'; };
-    put($('camFrame'), x, y, w, h); put($('chat'), x, cy, w, ch); put($('cta'), x, cy + ch + g, w, 64);
+    put($('camFrame'), x, y, w, h); put($('chat'), cx, cy, cw, ch); put($('cta'), cx, cy + ch + 16, cw, 64);
     $('camFrame').classList.toggle('hide', !r.frame);
   }
   /* ---- starting-soon page ---- */
@@ -656,7 +777,7 @@ if (CONTROL) {
     $('swap').onclick = () => { [S.home, S.away] = [S.away, S.home]; document.querySelectorAll('[data-b^="home."],[data-b^="away."]').forEach(el => el.value = getP(S, el.dataset.b)); refresh(); publish(); };
     $('zero').onclick = () => { S.home.score = 0; S.away.score = 0; refresh(); publish(); };
 
-    initGames(); initStart();
+    initGames(); initStart(); initRt();
 
     $('tStart').onclick = () => { if (!S.timer.running) { S.timer.startedAt = Date.now(); S.timer.running = true; publish(); } };
     $('tPause').onclick = () => { if (S.timer.running) { S.timer.base = elapsed(); S.timer.running = false; publish(); } };
@@ -694,9 +815,115 @@ if (CONTROL) {
     setInterval(() => { const e = Math.max(0, Math.floor(elapsed())); $('timeNow').textContent = String(Math.floor(e / 60)).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0'); }, 250);
   }
 
+  /* ---- chat ratings + word poll ---- */
+  const YT = { key: '', chatId: '', token: '', gap: 6000, t: null, R: {}, W: {}, P: new Set(), n: 0 };
+  let PL = {}, picFor = -1;
+  const rtMsg = t => { $('rtMsg').textContent = t; };
+  const lsGet = k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const vidId = u => { const m = u.match(/(?:v=|youtu\.be\/|\/live\/|\/shorts\/|\/embed\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(u) ? u : ''); };
+  const parseRating = t => { for (const m of t.matchAll(/(?<![\d.,])(\d{1,2}(?:[.,]\d)?)(?!\d)/g)) { const v = parseFloat(m[1].replace(',', '.')); if (v >= 1 && v <= 10) return String(v); } return null; };
+  const wordsOf = t => [...new Set(t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter(Boolean))];
+  const shrinkImg = (f, max) => readURL(f).then(u => new Promise((res, rej) => { const i = new Image(); i.onload = () => {
+    const sc = Math.min(1, max / Math.max(i.width, i.height)), c = document.createElement('canvas'); c.width = Math.round(i.width * sc); c.height = Math.round(i.height * sc);
+    c.getContext('2d').drawImage(i, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', .85)); }; i.onerror = rej; i.src = u; }));
+  function addMsg(text, who) {
+    const r = S.rt; if (r.phase !== 'open') return;
+    if (r.mode === 'rating') { const v = parseRating(text); if (v === null) return; YT.R[v] = (YT.R[v] || 0) + 1; }
+    else if (r.mode === 'poll') { const w = wordsOf(text); if (!w.length) return; w.forEach(x => { YT.W[x] = (YT.W[x] || 0) + 1; }); }
+    else return;
+    YT.n++; YT.P.add(who || 'test');
+  }
+  function rtLive() {
+    const r = S.rt, t = (r.top || []).slice(0, 3).map(x => x[0] + ' × ' + x[1]).join('   ·   ');
+    $('rtLive').textContent = r.phase === 'open' ? `Counting… ${t || 'no votes yet'}  (${r.total} votes, ${r.people} people)` : r.phase === 'done' ? `Finished: ${t || 'no votes'}  (${r.total} votes, ${r.people} people)` : 'No round running.';
+  }
+  function pub() {
+    const r = S.rt, src = r.mode === 'poll' ? YT.W : YT.R;
+    r.top = Object.entries(src).sort((a, b) => b[1] - a[1] || (r.mode === 'rating' ? b[0] - a[0] : (a[0] < b[0] ? -1 : 1))).slice(0, 5);
+    r.total = YT.n; r.people = YT.P.size; publish(); rtLive();
+  }
+  async function ytFetch(discard) {
+    if (!YT.chatId) return;
+    try {
+      const j = await (await fetch(`https://www.googleapis.com/youtube/v3/liveChat/messages?liveChatId=${encodeURIComponent(YT.chatId)}&part=snippet,authorDetails&maxResults=2000&key=${encodeURIComponent(YT.key)}` + (YT.token ? `&pageToken=${encodeURIComponent(YT.token)}` : ''))).json();
+      if (j.error) { rtMsg('Google says: ' + j.error.message); return; }
+      YT.token = j.nextPageToken || YT.token; YT.gap = Math.max(6000, j.pollingIntervalMillis || 6000);
+      if (!discard) (j.items || []).forEach(it => { const t = it.snippet && it.snippet.displayMessage; if (t) addMsg(t, it.authorDetails && it.authorDetails.channelId); });
+    } catch (e) { rtMsg('Could not read chat (network problem). Will keep trying.'); }
+  }
+  function loop() {
+    clearTimeout(YT.t); if (S.rt.phase !== 'open' || !YT.chatId) return;
+    YT.t = setTimeout(async () => { await ytFetch(false); if (S.rt.phase === 'open') { pub(); loop(); } }, YT.gap);
+  }
+  async function ytConnect() {
+    const key = $('ytKey').value.trim(), raw = $('ytVid').value.trim(), vid = vidId(raw);
+    if (!key || !vid) return rtMsg('Enter your API key and a valid live stream link.');
+    lsSet('yt-key', key); lsSet('yt-vid', raw); rtMsg('Connecting…');
+    try {
+      const j = await (await fetch(`https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails,snippet&id=${encodeURIComponent(vid)}&key=${encodeURIComponent(key)}`)).json();
+      if (j.error) return rtMsg('Google says: ' + j.error.message);
+      const it = j.items && j.items[0], id = it && it.liveStreamingDetails && it.liveStreamingDetails.activeLiveChatId;
+      if (!id) return rtMsg('No active live chat found. Is the stream live (or scheduled with chat open)?');
+      YT.key = key; YT.chatId = id; YT.token = ''; rtMsg('Connected to “' + it.snippet.title + '” ✓');
+    } catch (e) { rtMsg('Could not reach Google. Check your internet connection.'); }
+  }
+  async function openRound(mode, idx, endSecs) {
+    const r = S.rt; if (r.phase === 'open') return rtMsg('A round is already running — press Stop now first.');
+    YT.R = {}; YT.W = {}; YT.P = new Set(); YT.n = 0; r.top = []; r.total = 0; r.people = 0; r.mode = mode; r.cur = idx;
+    await ytFetch(true);   // skip anything said before the round starts
+    r.phase = 'open'; r.endAt = endSecs > 0 ? Date.now() + endSecs * 1000 : 0; pub(); loop();
+    if (!YT.chatId) rtMsg('Not connected to YouTube — only test votes will count.');
+  }
+  async function stopRound() {
+    const r = S.rt; if (r.phase !== 'open') return;
+    await ytFetch(false); r.phase = 'done'; r.endAt = 0; clearTimeout(YT.t);
+    if (r.mode === 'rating' && r.players[r.cur]) {
+      const p = r.players[r.cur], e = Object.entries(YT.R).sort((a, b) => b[1] - a[1] || b[0] - a[0]);
+      if (e.length) { let sum = 0, n = 0; e.forEach(([v, c]) => { sum += v * c; n += c; }); p.win = +e[0][0]; p.avg = Math.round(sum / n * 10) / 10; p.votes = n; }
+      else { p.win = null; p.avg = null; p.votes = 0; }
+    }
+    pub(); renderPl();
+  }
+  const savePL = async () => { try { await Sync.savePlayers(PL); S.rt.pRev = Date.now(); } catch (e) { rtMsg('Could not save pictures (check your database rules).'); } };
+  function renderPl() {
+    const r = S.rt; $('plList').innerHTML = r.players.length ? r.players.map((p, i) => `<div class="row" style="margin-top:6px;align-items:center"><span class="crest-prev" style="width:44px;height:44px;border-radius:12px;overflow:hidden;cursor:pointer" data-pic="${i}">${PL[p.id] ? `<img src="${PL[p.id]}" style="width:100%;height:100%;object-fit:cover" alt="">` : '📷'}</span><b style="flex:1">${i + 1}. ${esc(p.n)}${p.win != null ? ` — <span style="color:var(--gold)">${p.win}</span> <small>(avg ${p.avg}, ${p.votes} votes)</small>` : ''}</b><button class="ghost" data-go="${i}">▶ Start</button><button class="ghost" data-del="${i}">✕</button></div>`).join('') : '<small class="hint">No players yet.</small>';
+  }
+  function initRt() {
+    $('ytKey').value = lsGet('yt-key'); $('ytVid').value = lsGet('yt-vid');
+    Sync.loadPlayers().then(d => { PL = d || {}; renderPl(); }); renderPl(); rtLive();
+    $('ytGo').onclick = ytConnect;
+    const newId = () => 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    $('plAdd').onclick = async () => {
+      const n = $('plName').value.trim(); if (!n) return; const id = newId(); S.rt.players.push({ id, n });
+      const f = $('plImg').files[0]; if (f) { try { PL[id] = await shrinkImg(f, 360); await savePL(); } catch (e) { rtMsg('That picture could not be read.'); } }
+      $('plName').value = ''; $('plImg').value = ''; renderPl(); publish();
+    };
+    $('plBulkBtn').onclick = () => { $('plBulk').value.split('\n').map(x => x.trim()).filter(Boolean).forEach(n => S.rt.players.push({ id: newId(), n })); $('plBulk').value = ''; renderPl(); publish(); };
+    $('plList').onclick = e => {
+      const b = e.target.closest('[data-go],[data-del],[data-pic]'); if (!b) return; const r = S.rt;
+      if (b.dataset.pic !== undefined) { picFor = +b.dataset.pic; $('plPic').click(); }
+      else if (b.dataset.go !== undefined) openRound('rating', +b.dataset.go, +r.dur || 150);
+      else if (b.dataset.del !== undefined) { const i = +b.dataset.del; if (r.phase === 'open' && r.cur === i) return rtMsg('Stop the round first.'); const [p] = r.players.splice(i, 1); delete PL[p.id]; if (r.cur === i) r.cur = -1; else if (r.cur > i) r.cur--; savePL(); renderPl(); publish(); }
+    };
+    $('plPic').onchange = async e => { const f = e.target.files[0], p = S.rt.players[picFor]; e.target.value = ''; if (!f || !p) return;
+      try { PL[p.id] = await shrinkImg(f, 360); await savePL(); renderPl(); publish(); } catch (err) { rtMsg('That picture could not be read.'); } };
+    $('rtNext').onclick = () => { const i = S.rt.players.findIndex(p => p.votes === undefined); if (i < 0) return rtMsg('Every player has a rating already. Use ▶ Start on a player to redo one.'); openRound('rating', i, +S.rt.dur || 150); };
+    $('pollStart').onclick = () => openRound('poll', -1, +S.rt.pollDur || 0);
+    $('rtStop').onclick = stopRound;
+    $('rtRes').onclick = () => { if (S.rt.phase === 'open') return rtMsg('Stop the round first.'); S.rt.mode = 'results'; publish(); };
+    $('rtOff').onclick = () => { if (S.rt.phase === 'open') return rtMsg('Stop the round first.'); S.rt.mode = 'off'; publish(); };
+    $('rtReset').onclick = () => { if (!confirm('Clear every player’s rating?')) return; S.rt.players.forEach(p => { delete p.win; delete p.avg; delete p.votes; }); renderPl(); publish(); };
+    $('rtTestBtn').onclick = () => { const t = $('rtTest').value.trim(); if (!t) return; if (S.rt.phase !== 'open') return rtMsg('Start a round first, then add test votes.'); addMsg(t, 'test'); $('rtTest').value = ''; pub(); };
+    $('rtTest').onkeydown = e => { if (e.key === 'Enter') $('rtTestBtn').click(); };
+    setInterval(() => { const r = S.rt;
+      if (r.phase === 'open' && r.endAt) { const left = (r.endAt - Date.now()) / 1000; $('rtNow').textContent = fmtT(left); if (left <= 0) stopRound(); }
+      else $('rtNow').textContent = r.phase === 'open' ? 'Voting open' : ''; }, 500);
+  }
+
   function rxInfo() {
-    const r = S.rx, cy = r.camY + r.camH + 20;
-    $('rxInfo').textContent = `Reaction page = Browser Source 1920 × 1080 at x 0, y 0, placed above your camera. Streamlabs chat widget on top of it: size ${r.camW - 16} × ${r.chatH - 16}, position x ${r.camX + 8}, y ${cy + 8}.` + (cy + r.chatH + 20 + 64 > 1080 ? ' ⚠ The subscribe pop-up would fall off the bottom — lower the chat height.' : '');
+    const r = S.rx, cy = r.camY + r.camH + 20, cx = Math.round(r.camX + (r.camW - 440) / 2);
+    $('rxInfo').textContent = `Reaction page = Browser Source 1920 × 1080 at x 0, y 0, placed above your camera. Streamlabs chat widget on top of it: size 424 × 584, position x ${cx + 8}, y ${cy + 8}.` + (cy + 600 + 16 + 64 > 1080 ? ' ⚠ The subscribe pop-up would fall off the bottom of the screen — move the camera up or make it shorter.' : '');
   }
   const fillInputs = () => document.querySelectorAll('[data-b]').forEach(el => el.value = getP(S, el.dataset.b) ?? '');
   const readURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
