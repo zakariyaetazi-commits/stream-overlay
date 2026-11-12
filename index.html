@@ -124,8 +124,18 @@
   .sBars .rtVal{font-size:26px;min-width:56px}
   .sBars .rtVal.w{font-size:20px;min-width:110px;max-width:110px}
   .sBars .rtBar{height:12px}
-  .sBars .rtCnt{font-size:18px;min-width:44px}
+  .sBars .rtCnt{font-size:18px;min-width:56px}
   .sBars .rtWait{font-size:13px}
+  .pc{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px 8px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);cursor:pointer;text-align:center}
+  .pc:hover{background:rgba(255,255,255,.13)}
+  .pc.on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(237,187,0,.35)}
+  .pc .face{width:76px;height:76px;border-radius:16px;overflow:hidden;display:grid;place-items:center;font-weight:800;font-size:26px;background:linear-gradient(135deg,var(--blue2),var(--garnet))}
+  .pc .face img{width:100%;height:100%;object-fit:cover}
+  .pc .nm{font-weight:700;font-size:13px;line-height:1.15}
+  .pc .no{position:absolute;left:8px;top:6px;font-size:12px;font-weight:800;opacity:.75}
+  .pc .rate{font-size:13px;font-weight:800;color:var(--gold)}
+  .pc .x,.pc .cam{position:absolute;top:4px;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:8px;width:24px;height:24px;cursor:pointer;font-size:12px;padding:0;min-width:0}
+  .pc .x{right:4px}.pc .cam{right:32px}
   .rtResWrap{width:100%;height:100%;display:flex;flex-direction:column}
   .rtResTitle{font-weight:800;letter-spacing:10px;font-size:44px;color:var(--gold);text-align:center;margin-bottom:14px}
   .rtGrid{flex:1;display:grid;grid-auto-flow:column;grid-template-columns:1fr 1fr;column-gap:30px}
@@ -334,21 +344,23 @@
     <div class="card wide">
       <h2>Chat ratings &amp; word poll <a href="rating.html" target="_blank" style="font-size:13px;font-weight:600;margin-left:8px">Open page ↗</a></h2>
       <details><summary style="cursor:pointer;font-weight:700">One-time setup: get a free YouTube API key (≈5 min)</summary>
-        <small class="hint">1) Go to console.cloud.google.com and create a new project. 2) APIs &amp; Services → Library → search “YouTube Data API v3” → Enable. 3) APIs &amp; Services → Credentials → Create credentials → API key. 4) Copy the key and paste it below (it is stored only in this browser, never in your files or database). Free daily limit: 10,000 units; reading chat costs about 50 units per minute, and only while a round is open.</small>
+        <small class="hint">1) Go to console.cloud.google.com and create a new project. 2) APIs &amp; Services → Library → search “YouTube Data API v3” → Enable. 3) APIs &amp; Services → Credentials → Create credentials → API key. 4) Copy the key and paste it below (it is stored only in this browser, never in your files or database). Free daily limit: 10,000 units; reading chat costs about 50–100 units per minute, and only while a round is open.</small>
       </details>
-      <label>YouTube API key</label><input type="password" id="ytKey" placeholder="AIza…">
+      <label>YouTube API key</label><input type="password" id="ytKey" placeholder="AIza…" style="width:100%">
       <label>Live stream link</label>
       <div class="row" style="margin-top:0"><input type="text" id="ytVid" placeholder="https://www.youtube.com/watch?v=…" style="flex:1;min-width:240px"><button id="ytGo">Connect</button></div>
       <small class="hint" id="rtMsg">Not connected. You can still test with the test-vote box below.</small>
 
-      <label style="margin-top:14px">Players (name + optional picture)</label>
+      <label style="margin-top:14px">Players — the Barcelona squad is loaded for you; add faces below</label>
       <div class="row" style="margin-top:0"><input type="text" id="plName" placeholder="Player name" style="flex:1;min-width:180px"><input type="file" id="plImg" accept="image/*"><button id="plAdd">Add</button></div>
       <div class="row"><textarea id="plBulk" rows="2" placeholder="Or paste many names, one per line…" style="flex:1;min-width:240px"></textarea><button class="ghost" id="plBulkBtn">Add names</button></div>
+      <div class="row"><input type="file" id="plBulkPics" accept="image/*" multiple><button class="ghost" id="plSquad">Load Barça squad</button></div>
+      <small class="hint">Add many faces at once: select all the photos and name each file after the player (pedri.jpg, lamine yamal.png…). They’re matched by name.</small>
       <div id="plList"></div><input type="file" id="plPic" accept="image/*" style="display:none">
-      <small class="hint">Click a player’s picture box to add or change the picture.</small>
+      <small class="hint">Click a player to start his voting round (a running round is closed first). 📷 adds or changes a face, ✕ removes him.</small>
 
       <div class="two" style="margin-top:12px">
-        <div><label>Round length (seconds)</label><input type="number" data-b="rt.dur" min="10">
+        <div><label>Round length (seconds, 0 = until I press Stop)</label><input type="number" data-b="rt.dur" min="0">
           <div class="row"><button class="gold" id="rtNext">Start next player</button><button class="ghost" id="rtStop">Stop now</button></div></div>
         <div><label>Poll title</label><input type="text" data-b="rt.pollTitle" placeholder="Who is man of the match?">
           <label>Poll length (seconds, 0 = until I stop it)</label><input type="number" data-b="rt.pollDur" min="0">
@@ -359,7 +371,7 @@
       <div class="row"><input type="text" id="rtTest" placeholder="Test vote: type a message like “9” or “messi”" style="flex:1;min-width:240px"><button class="ghost" id="rtTestBtn">Add test vote</button></div>
       <div class="row"><button class="gold" id="rtRes">Show final ratings</button><button class="ghost" id="rtOff">Hide overlay</button><button class="ghost" id="rtReset">Clear all ratings</button>
         <select data-b="rt.pos"><option value="bottom">Card at bottom</option><option value="center">Card in middle</option><option value="top">Card at top</option></select></div>
-      <small class="hint">Keep this control page open while a round runs: it reads the chat and ends the round. Add rating.html as a Browser Source (1920 × 1080 at 0, 0).</small>
+      <small class="hint">The card also shows on your main overlay (bottom centre, same width as the upcoming-games box). Keep this control page open while a round runs: it reads the chat and ends the round.</small>
     </div>
 
     <div class="card wide">
@@ -458,7 +470,7 @@ const Sync = (() => {
     show: { score: true, table: true, fixtures: true, chat: true, cta: true },
     start: { title: 'STARTING SOON', end: 'CHAAAAAAAT', duration: 300, left: 300, running: false, endAt: 0, chat: true, cta: true, media: { type: '', src: '', up: 0 } },
     rx: { camX: 1252, camY: 22, camW: 610, camH: 340, chatH: 500, frame: true, chat: true, cta: true },
-    rt: { mode: 'off', phase: 'idle', cur: -1, dur: 150, pollDur: 0, pollTitle: '', pos: 'bottom', endAt: 0, total: 0, people: 0, top: [], players: [], pRev: 0 }
+    rt: { mode: 'off', phase: 'idle', cur: -1, dur: 150, pollDur: 0, pollTitle: '', pos: 'bottom', endAt: 0, total: 0, people: 0, top: [], players: [], pRev: 0, seeded: false }
   };
 
   const clone = o => JSON.parse(JSON.stringify(o));
@@ -668,10 +680,10 @@ if (!CONTROL) {
     $('chat').classList.toggle('hide', !sh.chat);
     if (START) renderStart();
     if (REACT) renderReact();
-    if (RATE) renderRate();
+    if (!START && !REACT) renderRate();
   }
   function tick() {
-    if (RATE) tickRate();
+    if (!START && !REACT) tickRate();
     if (START) tickStart();
     const t = S.timer, e = Math.max(0, Math.floor(t.base + (t.running ? (Date.now() - t.startedAt) / 1000 : 0)));
     $('clock').textContent = String(Math.floor(e / 60)).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0');
@@ -679,14 +691,16 @@ if (!CONTROL) {
   /* ---- rating / poll page ---- */
   let rtKey = '', PIMG = {}, pRevLoaded = -1;
   function tickRate() { const r = S.rt, t = $('rtTime'); if (t && r.endAt) t.textContent = fmtT(Math.max(0, (r.endAt - Date.now()) / 1000)); }
+  let rtSk = '';
   function renderRate() {
     const r = S.rt, el = $('rt');
-    if (r.pRev !== pRevLoaded) { pRevLoaded = r.pRev; Sync.loadPlayers().then(d => { PIMG = d || {}; rtKey = ''; renderRate(); }); }
+    if (r.pRev !== pRevLoaded) { pRevLoaded = r.pRev; Sync.loadPlayers().then(d => { PIMG = d || {}; rtKey = ''; rtSk = ''; renderRate(); }); }
     const key = JSON.stringify(r); if (key === rtKey) return; rtKey = key;
-    if (r.mode !== 'rating' && r.mode !== 'poll' && r.mode !== 'results') { el.style.cssText = 'display:none'; return; }
-    const done = r.phase === 'done', top = (r.top || []).slice(0, 3), max = Math.max(1, ...top.map(t => t[1]));
-    const img = (p, c) => PIMG[p.id] ? `<img src="${PIMG[p.id]}" alt="">` : esc((p.n || '?').slice(0, 2).toUpperCase());
+    if (r.mode !== 'rating' && r.mode !== 'poll' && r.mode !== 'results') { el.style.cssText = 'display:none'; rtSk = ''; return; }
+    const done = r.phase === 'done', top = (r.top || []).slice(0, 3);
+    const img = p => PIMG[p.id] ? `<img src="${PIMG[p.id]}" alt="">` : esc((p.n || '?').slice(0, 2).toUpperCase());
     if (r.mode === 'results') {
+      rtSk = '';
       const list = r.players.filter(p => p.win != null).sort((a, b) => b.win - a.win || (b.avg || 0) - (a.avg || 0));
       const rows = Math.max(1, Math.ceil(list.length / 2)), rh = Math.min(96, Math.floor(740 / rows));
       const H = Math.min(900, 150 + rows * rh + 24);
@@ -696,10 +710,19 @@ if (!CONTROL) {
         : '<div class="rtWait" style="margin:auto">No ratings yet</div>') + '</div>';
       return;
     }
+    const sum = top.reduce((x, t) => x + t[1], 0) || 1, pc = top.map(t => Math.round(t[1] / sum * 100)), diff = 100 - pc.reduce((x, y) => x + y, 0);
+    if (pc.length && diff) pc[0] += diff;
+    const poll = r.mode === 'poll', p = r.players[r.cur] || {};
+    const sk = JSON.stringify([r.mode, r.cur, r.phase, r.pos, r.pollTitle, !!r.endAt, top.map(t => t[0]), p.win, p.avg, p.votes, !!PIMG[p.id], done ? r.total : 0]);
+    if (sk === rtSk) {   // same layout: just move the bars so they animate live
+      el.querySelectorAll('.rtBar i').forEach((x, i) => { x.style.width = pc[i] + '%'; });
+      el.querySelectorAll('.rtCnt').forEach((x, i) => { x.textContent = pc[i] + '%'; });
+      return;
+    }
+    rtSk = sk;
     const pos = r.pos === 'top' ? 'top:40px' : r.pos === 'center' ? 'top:430px' : 'bottom:40px';
     el.style.cssText = `display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:18px 20px;left:735px;width:450px;${pos}`;
-    const poll = r.mode === 'poll', p = r.players[r.cur] || {};
-    const bars = top.length ? top.map(t => `<div class="rtRow"><b class="rtVal${poll ? ' w' : ''}">${esc(poll ? t[0].toUpperCase() : t[0])}</b><div class="rtBar"><i style="width:${t[1] / max * 100}%"></i></div><span class="rtCnt">${t[1]}</span></div>`).join('') : '<div class="rtWait">WAITING FOR VOTES…</div>';
+    const bars = top.length ? top.map((t, i) => `<div class="rtRow"><b class="rtVal${poll ? ' w' : ''}">${esc(poll ? t[0].toUpperCase() : t[0])}</b><div class="rtBar"><i style="width:${pc[i]}%"></i></div><span class="rtCnt">${pc[i]}%</span></div>`).join('') : '<div class="rtWait">WAITING FOR VOTES…</div>';
     const clock = r.endAt ? '<div class="rtTime" id="rtTime">00:00</div>' : '<div class="rtSub" style="font-size:13px">VOTING IS OPEN</div>';
     const win = poll ? (top[0] ? esc(top[0][0].toUpperCase()) : '–') : (p.win != null ? p.win : '–');
     const sub = poll ? `${r.total} MESSAGES` : `AVG ${p.avg != null ? p.avg : '–'} · ${p.votes || 0} VOTES`;
@@ -816,12 +839,15 @@ if (CONTROL) {
   }
 
   /* ---- chat ratings + word poll ---- */
-  const YT = { key: '', chatId: '', token: '', gap: 6000, t: null, R: {}, W: {}, P: new Set(), n: 0 };
+  const YT = { key: '', chatId: '', token: '', gap: 4000, t: null, R: {}, W: {}, P: new Set(), n: 0 };
   let PL = {}, picFor = -1;
   const rtMsg = t => { $('rtMsg').textContent = t; };
   const lsGet = k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
   const vidId = u => { const m = u.match(/(?:v=|youtu\.be\/|\/live\/|\/shorts\/|\/embed\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(u) ? u : ''); };
+  const nrm = x => x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+  const roundLen = () => { const d = S.rt.dur; return (d === 0 || d === '0') ? 0 : (+d || 150); };
+  const SQUAD = [[1,'Joan García'],[2,'João Cancelo'],[3,'Alejandro Balde'],[4,'Brian Fariñas'],[5,'Pau Cubarsí'],[6,'Gavi'],[7,'Fermín López'],[8,'Pedri'],[9,'Gabriel Jesus'],[10,'Lamine Yamal'],[11,'Raphinha'],[12,'Xavi Espart'],[13,'Szczęsny'],[14,'Adeyemi'],[15,'Christensen'],[16,'Rodri'],[17,'Anthony Gordon'],[18,'Gerard Martín'],[19,'Roony Bardghji'],[20,'Dani Olmo'],[21,'Frenkie de Jong'],[22,'Marc Bernal'],[23,'Jules Koundé'],[24,'Eric García'],[25,'Livaković'],[27,'Jesse Bisiwu'],[29,'Hamza Abdelkarim']];
   const parseRating = t => { for (const m of t.matchAll(/(?<![\d.,])(\d{1,2}(?:[.,]\d)?)(?!\d)/g)) { const v = parseFloat(m[1].replace(',', '.')); if (v >= 1 && v <= 10) return String(v); } return null; };
   const wordsOf = t => [...new Set(t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter(Boolean))];
   const shrinkImg = (f, max) => readURL(f).then(u => new Promise((res, rej) => { const i = new Image(); i.onload = () => {
@@ -835,7 +861,7 @@ if (CONTROL) {
     YT.n++; YT.P.add(who || 'test');
   }
   function rtLive() {
-    const r = S.rt, t = (r.top || []).slice(0, 3).map(x => x[0] + ' × ' + x[1]).join('   ·   ');
+    const r = S.rt, t3 = (r.top || []).slice(0, 3), sm = t3.reduce((a, x) => a + x[1], 0) || 1, t = t3.map(x => x[0] + ' ' + Math.round(x[1] / sm * 100) + '%').join('   ·   ');
     $('rtLive').textContent = r.phase === 'open' ? `Counting… ${t || 'no votes yet'}  (${r.total} votes, ${r.people} people)` : r.phase === 'done' ? `Finished: ${t || 'no votes'}  (${r.total} votes, ${r.people} people)` : 'No round running.';
   }
   function pub() {
@@ -848,7 +874,7 @@ if (CONTROL) {
     try {
       const j = await (await fetch(`https://www.googleapis.com/youtube/v3/liveChat/messages?liveChatId=${encodeURIComponent(YT.chatId)}&part=snippet,authorDetails&maxResults=2000&key=${encodeURIComponent(YT.key)}` + (YT.token ? `&pageToken=${encodeURIComponent(YT.token)}` : ''))).json();
       if (j.error) { rtMsg('Google says: ' + j.error.message); return; }
-      YT.token = j.nextPageToken || YT.token; YT.gap = Math.max(6000, j.pollingIntervalMillis || 6000);
+      YT.token = j.nextPageToken || YT.token; YT.gap = Math.max(3000, j.pollingIntervalMillis || 3000);
       if (!discard) (j.items || []).forEach(it => { const t = it.snippet && it.snippet.displayMessage; if (t) addMsg(t, it.authorDetails && it.authorDetails.channelId); });
     } catch (e) { rtMsg('Could not read chat (network problem). Will keep trying.'); }
   }
@@ -872,7 +898,7 @@ if (CONTROL) {
     const r = S.rt; if (r.phase === 'open') return rtMsg('A round is already running — press Stop now first.');
     YT.R = {}; YT.W = {}; YT.P = new Set(); YT.n = 0; r.top = []; r.total = 0; r.people = 0; r.mode = mode; r.cur = idx;
     await ytFetch(true);   // skip anything said before the round starts
-    r.phase = 'open'; r.endAt = endSecs > 0 ? Date.now() + endSecs * 1000 : 0; pub(); loop();
+    r.phase = 'open'; r.endAt = endSecs > 0 ? Date.now() + endSecs * 1000 : 0; pub(); loop(); renderPl();
     if (!YT.chatId) rtMsg('Not connected to YouTube — only test votes will count.');
   }
   async function stopRound() {
@@ -887,29 +913,44 @@ if (CONTROL) {
   }
   const savePL = async () => { try { await Sync.savePlayers(PL); S.rt.pRev = Date.now(); } catch (e) { rtMsg('Could not save pictures (check your database rules).'); } };
   function renderPl() {
-    const r = S.rt; $('plList').innerHTML = r.players.length ? r.players.map((p, i) => `<div class="row" style="margin-top:6px;align-items:center"><span class="crest-prev" style="width:44px;height:44px;border-radius:12px;overflow:hidden;cursor:pointer" data-pic="${i}">${PL[p.id] ? `<img src="${PL[p.id]}" style="width:100%;height:100%;object-fit:cover" alt="">` : '📷'}</span><b style="flex:1">${i + 1}. ${esc(p.n)}${p.win != null ? ` — <span style="color:var(--gold)">${p.win}</span> <small>(avg ${p.avg}, ${p.votes} votes)</small>` : ''}</b><button class="ghost" data-go="${i}">▶ Start</button><button class="ghost" data-del="${i}">✕</button></div>`).join('') : '<small class="hint">No players yet.</small>';
+    const r = S.rt, L = $('plList');
+    L.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;margin-top:10px';
+    L.innerHTML = r.players.map((p, i) => `<div class="pc${r.phase === 'open' && r.mode === 'rating' && r.cur === i ? ' on' : ''}" data-go="${i}">${p.no ? `<span class="no">${p.no}</span>` : ''}<button class="cam" data-pic="${i}" title="Add / change face">📷</button><button class="x" data-del="${i}" title="Remove">✕</button><div class="face">${PL[p.id] ? `<img src="${PL[p.id]}" alt="">` : esc((p.n || '?').slice(0, 2).toUpperCase())}</div><div class="nm">${esc(p.n)}</div>${p.win != null ? `<div class="rate">${p.win} <small>(avg ${p.avg})</small></div>` : ''}</div>`).join('') || '<small class="hint">No players yet.</small>';
   }
   function initRt() {
+    const loadSquad = () => { let n = 0; SQUAD.forEach(([no, name]) => { const id = 'b' + no; if (!S.rt.players.some(p => p.id === id)) { S.rt.players.push({ id, n: name, no }); n++; } }); return n; };
+    if (!S.rt.seeded) { loadSquad(); S.rt.seeded = true; publish(); }
+    $('plSquad').onclick = () => { const n = loadSquad(); renderPl(); publish(); rtMsg(n ? `Added ${n} squad players.` : 'The whole squad is already in the list.'); };
+    $('plBulkPics').onchange = async e => {
+      const files = [...e.target.files]; e.target.value = ''; let ok = 0; const miss = [];
+      for (const f of files) {
+        const k = nrm(f.name.replace(/\.[^.]+$/, '')), P = S.rt.players;
+        const p = P.find(x => { const n = nrm(x.n); return k && (n.includes(k) || k.includes(n)); }) || P.find(x => { const n = nrm(x.n.split(' ').pop()); return n.length >= 4 && k.includes(n); });
+        if (!p) { miss.push(f.name); continue; }
+        try { PL[p.id] = await shrinkImg(f, 240); ok++; } catch (err) { miss.push(f.name); }
+      }
+      await savePL(); renderPl(); publish(); rtMsg(`Matched ${ok} of ${files.length} photos.` + (miss.length ? ' Not matched: ' + miss.join(', ') : ''));
+    };
     $('ytKey').value = lsGet('yt-key'); $('ytVid').value = lsGet('yt-vid');
     Sync.loadPlayers().then(d => { PL = d || {}; renderPl(); }); renderPl(); rtLive();
     $('ytGo').onclick = ytConnect;
     const newId = () => 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     $('plAdd').onclick = async () => {
       const n = $('plName').value.trim(); if (!n) return; const id = newId(); S.rt.players.push({ id, n });
-      const f = $('plImg').files[0]; if (f) { try { PL[id] = await shrinkImg(f, 360); await savePL(); } catch (e) { rtMsg('That picture could not be read.'); } }
+      const f = $('plImg').files[0]; if (f) { try { PL[id] = await shrinkImg(f, 240); await savePL(); } catch (e) { rtMsg('That picture could not be read.'); } }
       $('plName').value = ''; $('plImg').value = ''; renderPl(); publish();
     };
     $('plBulkBtn').onclick = () => { $('plBulk').value.split('\n').map(x => x.trim()).filter(Boolean).forEach(n => S.rt.players.push({ id: newId(), n })); $('plBulk').value = ''; renderPl(); publish(); };
     $('plList').onclick = e => {
       const b = e.target.closest('[data-go],[data-del],[data-pic]'); if (!b) return; const r = S.rt;
       if (b.dataset.pic !== undefined) { picFor = +b.dataset.pic; $('plPic').click(); }
-      else if (b.dataset.go !== undefined) openRound('rating', +b.dataset.go, +r.dur || 150);
-      else if (b.dataset.del !== undefined) { const i = +b.dataset.del; if (r.phase === 'open' && r.cur === i) return rtMsg('Stop the round first.'); const [p] = r.players.splice(i, 1); delete PL[p.id]; if (r.cur === i) r.cur = -1; else if (r.cur > i) r.cur--; savePL(); renderPl(); publish(); }
+      else if (b.dataset.go !== undefined) { (async () => { if (r.phase === 'open') await stopRound(); openRound('rating', +b.dataset.go, roundLen()); })(); }
+      else if (b.dataset.del !== undefined) { const i = +b.dataset.del; if (r.phase === 'open' && r.cur === i) return rtMsg('Stop the round first.'); if (!confirm('Remove ' + r.players[i].n + ' from the list?')) return; const [p] = r.players.splice(i, 1); delete PL[p.id]; if (r.cur === i) r.cur = -1; else if (r.cur > i) r.cur--; savePL(); renderPl(); publish(); }
     };
     $('plPic').onchange = async e => { const f = e.target.files[0], p = S.rt.players[picFor]; e.target.value = ''; if (!f || !p) return;
-      try { PL[p.id] = await shrinkImg(f, 360); await savePL(); renderPl(); publish(); } catch (err) { rtMsg('That picture could not be read.'); } };
-    $('rtNext').onclick = () => { const i = S.rt.players.findIndex(p => p.votes === undefined); if (i < 0) return rtMsg('Every player has a rating already. Use ▶ Start on a player to redo one.'); openRound('rating', i, +S.rt.dur || 150); };
-    $('pollStart').onclick = () => openRound('poll', -1, +S.rt.pollDur || 0);
+      try { PL[p.id] = await shrinkImg(f, 240); await savePL(); renderPl(); publish(); } catch (err) { rtMsg('That picture could not be read.'); } };
+    $('rtNext').onclick = () => { const i = S.rt.players.findIndex(p => p.votes === undefined); if (i < 0) return rtMsg('Every player has a rating already. Use ▶ Start on a player to redo one.'); openRound('rating', i, roundLen()); };
+    $('pollStart').onclick = async () => { if (S.rt.phase === 'open') await stopRound(); openRound('poll', -1, +S.rt.pollDur || 0); };
     $('rtStop').onclick = stopRound;
     $('rtRes').onclick = () => { if (S.rt.phase === 'open') return rtMsg('Stop the round first.'); S.rt.mode = 'results'; publish(); };
     $('rtOff').onclick = () => { if (S.rt.phase === 'open') return rtMsg('Stop the round first.'); S.rt.mode = 'off'; publish(); };
